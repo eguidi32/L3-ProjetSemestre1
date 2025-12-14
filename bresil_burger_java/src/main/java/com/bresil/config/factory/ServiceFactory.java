@@ -5,14 +5,16 @@ import com.bresil.service.ComplementService;
 import com.bresil.service.impl.IBurgerService;
 import com.bresil.service.impl.IComplementService;
 import com.bresil.service.MenuService;
+import com.bresil.service.ZoneService;
 import com.bresil.service.impl.IMenuService;
+import com.bresil.service.impl.IZoneService;
 
 public class ServiceFactory {
     private static ServiceFactory instance;
     private BurgerService burgerService;
     private ComplementService complementService;
     private MenuService menuService;
-
+    private ZoneService zoneService;
 
     // Constructeur privé (Singleton)
     private ServiceFactory() {
@@ -50,5 +52,12 @@ public class ServiceFactory {
             menuService = new IMenuService();
         }
         return menuService;
+    }
+
+    public ZoneService getZoneService() {
+        if (zoneService == null) {
+            zoneService = new IZoneService();
+        }
+        return zoneService;
     }
 }
