@@ -1,15 +1,15 @@
 # Compiled class files
 *.class
 target/
-*. jar
+*.jar
 *.war
 *.ear
 
 # IDE files
 .vscode/
-. idea/
+.idea/
 *.iml
-. settings/
+.settings/
 .project
 .classpath
 

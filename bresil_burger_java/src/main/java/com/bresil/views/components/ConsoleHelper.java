@@ -2,7 +2,6 @@ package com.bresil.views.components;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
 import java.io.File;
 import java.util.Scanner;
 
