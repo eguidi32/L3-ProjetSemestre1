@@ -5,6 +5,8 @@ import com.bresil.repository.BurgerRepository;
 import com.bresil.repository.ComplementRepository;
 import com.bresil.repository.impl.IBurgerRepository;
 import com.bresil.repository.impl.IComplementRepository;
+import com.bresil.repository.MenuRepository;
+import com.bresil.repository.impl.IMenuRepository;
 /**
  * Factory des repositories
  */
@@ -12,6 +14,7 @@ public class RepositoryFactory {
     
     private static RepositoryFactory instance;
     private ComplementRepository complementRepository;
+    private MenuRepository menuRepository;
 
     // Cache des instances de repositories (Singleton par type)
     private BurgerRepository burgerRepository;
@@ -47,6 +50,13 @@ public class RepositoryFactory {
         return complementRepository;
     }
     
+    public MenuRepository getMenuRepository() {
+        if (menuRepository == null) {
+            menuRepository = new IMenuRepository();
+        }
+        return menuRepository;
+    }
+
     
 
 }

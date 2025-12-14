@@ -3,6 +3,7 @@ package com.bresil.views;
 import com.bresil.views.components.BurgerView;
 import com.bresil.views.components.ComplementView;
 import com.bresil.views.components.ConsoleHelper;
+import com.bresil.views.components.MenuView;
 
 /**
  * Vue principale de l'application
@@ -12,10 +13,12 @@ public class MainView {
     
     private final BurgerView burgerView;
     private final ComplementView complementView;
+    private final MenuView menuView;
 
     public MainView() {
         this.burgerView = new BurgerView();
         this.complementView = new ComplementView();
+        this.menuView = new MenuView();
     }
     
     /**
@@ -40,6 +43,7 @@ public class MainView {
                     burgerView.afficherMenu();
                     break;
                 case 2:
+                    menuView.afficherMenu();
                     break;
                 case 3:
                     complementView.afficherMenu();
