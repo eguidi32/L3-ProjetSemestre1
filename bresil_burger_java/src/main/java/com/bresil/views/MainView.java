@@ -1,6 +1,7 @@
 package com.bresil.views;
 
 import com.bresil.views.components.BurgerView;
+import com.bresil.views.components.ComplementView;
 import com.bresil.views.components.ConsoleHelper;
 
 /**
@@ -10,9 +11,11 @@ import com.bresil.views.components.ConsoleHelper;
 public class MainView {
     
     private final BurgerView burgerView;
+    private final ComplementView complementView;
 
     public MainView() {
         this.burgerView = new BurgerView();
+        this.complementView = new ComplementView();
     }
     
     /**
@@ -39,6 +42,7 @@ public class MainView {
                 case 2:
                     break;
                 case 3:
+                    complementView.afficherMenu();
                     break;
                 case 4:
                     break;

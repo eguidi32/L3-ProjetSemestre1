@@ -1,11 +1,15 @@
 package com.bresil.config.factory;
 
 import com.bresil.service.BurgerService;
+import com.bresil.service.ComplementService;
 import com.bresil.service.impl.IBurgerService;
+import com.bresil.service.impl.IComplementService;
 
 public class ServiceFactory {
     private static ServiceFactory instance;
     private BurgerService burgerService;
+    private ComplementService complementService;
+    
 
 
     // Constructeur privé (Singleton)
@@ -30,5 +34,12 @@ public class ServiceFactory {
             burgerService = new IBurgerService();
         }
         return burgerService;
+    }
+
+    public ComplementService getComplementService() {
+        if (complementService == null) {
+            complementService = new IComplementService();
+        }
+        return complementService;
     }
 }
