@@ -87,19 +87,14 @@ public class ComplementView {
                     return;
             }
             
-            String cheminOuUrl = ConsoleHelper.lireTexte("Chemin local ou URL de l'image : ");
-            
-            // Vérifier si c'est une URL ou un fichier local
-            File imageFile = null;
-            if (!cheminOuUrl.startsWith("http://") && !cheminOuUrl.startsWith("https://")) {
-                imageFile = new File(cheminOuUrl);
-                if (!imageFile.exists()) {
-                    ConsoleHelper.afficherErreur("Le fichier image n'existe pas");
-                    return;
-                }
+            // Sélection de l'image via fenêtre de dialogue
+            File imageFile = ConsoleHelper.selectionnerImage();
+            if (imageFile == null) {
+                ConsoleHelper.afficherErreur("Une image est requise pour créer un complément");
+                return;
             }
             
-            Long id = complementService.creerComplement(nom, prix, categorie, imageFile, cheminOuUrl);
+            Long id = complementService.creerComplement(nom, prix, categorie, imageFile, imageFile.getAbsolutePath());
             ConsoleHelper.afficherSucces("Complément créé avec succès ! ID: " + id);
             
         } catch (Exception e) {
@@ -148,16 +143,11 @@ public class ComplementView {
                     return;
             }
             
-            System.out.print("Nouveau chemin image (ou vide pour garder l'ancienne) : ");
-            String cheminImage = ConsoleHelper.scanner.nextLine().trim();
-            
+            // Demander si nouvelle image
+            boolean changerImage = ConsoleHelper.lireConfirmation("Changer l'image ?");
             File imageFile = null;
-            if (!cheminImage.isEmpty()) {
-                imageFile = new File(cheminImage);
-                if (!imageFile.exists()) {
-                    ConsoleHelper.afficherAvertissement("Fichier introuvable, conservation de l'ancienne image");
-                    imageFile = null;
-                }
+            if (changerImage) {
+                imageFile = ConsoleHelper.selectionnerImage();
             }
             
             complementService.modifierComplement(id, nom, prix, categorie, imageFile);

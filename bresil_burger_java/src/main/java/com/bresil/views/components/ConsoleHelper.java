@@ -1,5 +1,9 @@
 package com.bresil.views.components;
 
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
+import java.io.File;
 import java.util.Scanner;
 
 /**
@@ -135,5 +139,50 @@ public class ConsoleHelper {
      */
     public static void afficherAvertissement(String message) {
         System.out.println("Avertissement" + message);
+    }
+    
+    /**
+     * Ouvre une fenêtre de sélection de fichier image
+     * @return le fichier sélectionné ou null si annulé
+     */
+    public static File selectionnerImage() {
+        System.out.println("Ouverture du sélecteur de fichier...");
+        
+        try {
+            // Forcer le look and feel natif du système
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception ignored) {}
+        
+        // Créer une frame invisible pour ancrer le dialogue
+        JFrame frame = new JFrame();
+        frame.setAlwaysOnTop(true);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Sélectionner une image");
+        
+        // Filtre pour les images
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(
+            "Images (JPG, PNG, GIF, WEBP)", "jpg", "jpeg", "png", "gif", "webp"
+        );
+        fileChooser.setFileFilter(filter);
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        
+        // Ouvrir dans le dossier utilisateur par défaut
+        fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+        
+        int result = fileChooser.showOpenDialog(frame);
+        
+        // Fermer la frame invisible
+        frame.dispose();
+        
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            System.out.println("Image sélectionnée : " + selectedFile.getName());
+            return selectedFile;
+        } else {
+            System.out.println("Sélection annulée");
+            return null;
+        }
     }
 }

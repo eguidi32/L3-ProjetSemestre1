@@ -80,15 +80,11 @@ public class MenuView {
             // 1. Nom du menu
             String nom = ConsoleHelper.lireTexte("Nom du menu : ");
             
-            // 2. Image (URL ou fichier local)
-            String cheminOuUrl = ConsoleHelper.lireTexte("Chemin local ou URL de l'image : ");
-            File imageFile = null;
-            if (!cheminOuUrl.startsWith("http://") && !cheminOuUrl.startsWith("https://")) {
-                imageFile = new File(cheminOuUrl);
-                if (!imageFile.exists()) {
-                    ConsoleHelper.afficherErreur("Le fichier image n'existe pas");
-                    return;
-                }
+            // 2. Image via sélecteur de fichier
+            File imageFile = ConsoleHelper.selectionnerImage();
+            if (imageFile == null) {
+                ConsoleHelper.afficherErreur("Une image est requise pour créer un menu");
+                return;
             }
             
             // 3. Sélection du Burger
@@ -122,7 +118,7 @@ public class MenuView {
             Long idFrites = ConsoleHelper.lireLong("ID des frites : ");
             
             // Création du menu
-            Long id = menuService.creerMenuAvecComposition(nom, imageFile, cheminOuUrl, idBurger, idBoisson, idFrites);
+            Long id = menuService.creerMenuAvecComposition(nom, imageFile, imageFile.getAbsolutePath(), idBurger, idBoisson, idFrites);
             ConsoleHelper.afficherSucces("Menu créé avec succès ! ID: " + id);
             
         } catch (Exception e) {
@@ -205,16 +201,13 @@ public class MenuView {
             Long idFrites = ConsoleHelper.lireLong("ID des frites : ");
             
             // Image (optionnelle)
-            System.out.print("Nouvelle image (chemin/URL ou vide pour garder l'ancienne) : ");
-            String cheminOuUrl = ConsoleHelper.scanner.nextLine().trim();
-            
+            boolean changerImage = ConsoleHelper.lireConfirmation("Changer l'image ?");
             File imageFile = null;
-            if (!cheminOuUrl.isEmpty() && !cheminOuUrl.startsWith("http://") && !cheminOuUrl.startsWith("https://")) {
-                imageFile = new File(cheminOuUrl);
-                if (!imageFile.exists()) {
-                    ConsoleHelper.afficherAvertissement("Fichier introuvable, conservation de l'ancienne image");
-                    imageFile = null;
-                    cheminOuUrl = null;
+            String cheminOuUrl = null;
+            if (changerImage) {
+                imageFile = ConsoleHelper.selectionnerImage();
+                if (imageFile != null) {
+                    cheminOuUrl = imageFile.getAbsolutePath();
                 }
             }
             
