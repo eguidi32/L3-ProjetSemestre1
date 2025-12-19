@@ -1,0 +1,98 @@
+@model Commande
+@{
+    ViewData["Title"] = "Paiement";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow mt-4">
+                <div class="card-header bg-warning text-dark text-center">
+                    <h4 class="mb-0">💳 Paiement de la commande #@Model.Id</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Récapitulatif -->
+                    <div class="alert alert-info">
+                        <h6 class="mb-2">📋 Récapitulatif</h6>
+                        <div class="d-flex justify-content-between">
+                            <span>Type de livraison :</span>
+                            <strong>
+                                @switch (Model.TypeLivraison)
+                                {
+                                    case "sur_place":
+                                        <span>🍽️ Sur place</span>
+                                        break;
+                                    case "a_emporter":
+                                        <span>🥡 À emporter</span>
+                                        break;
+                                    case "livraison":
+                                        <span>🛵 Livraison - @Model.Zone?.Nom</span>
+                                        break;
+                                }
+                            </strong>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between fs-5">
+                            <span>Montant total :</span>
+                            <strong class="text-warning">@Model.MontantTotal.ToString("N0") FCFA</strong>
+                        </div>
+                    </div>
+
+                    <!-- Formulaire de paiement -->
+                    <form asp-action="EffectuerPaiement" method="post">
+                        <input type="hidden" name="commandeId" value="@Model.Id" />
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Mode de paiement</label>
+                            
+                            <div class="d-grid gap-2">
+                                <div class="form-check border rounded p-3">
+                                    <input class="form-check-input" type="radio" name="modePaiement" 
+                                           id="wave" value="Wave" checked>
+                                    <label class="form-check-label d-flex align-items-center" for="wave">
+                                        <span class="fs-4 me-2">🌊</span>
+                                        <div>
+                                            <strong>Wave</strong>
+                                            <small class="text-muted d-block">Paiement mobile Wave</small>
+                                        </div>
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check border rounded p-3">
+                                    <input class="form-check-input" type="radio" name="modePaiement" 
+                                           id="om" value="OM">
+                                    <label class="form-check-label d-flex align-items-center" for="om">
+                                        <span class="fs-4 me-2">🟠</span>
+                                        <div>
+                                            <strong>Orange Money</strong>
+                                            <small class="text-muted d-block">Paiement mobile OM</small>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="telephone" class="form-label">Numéro de téléphone</label>
+                            <input type="tel" class="form-control" id="telephone" name="telephone" 
+                                   placeholder="77 123 45 67" required>
+                            <small class="text-muted">Le numéro associé à votre compte Wave ou OM</small>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-warning btn-lg">
+                                ✅ Confirmer le paiement
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <a asp-controller="Catalogue" asp-action="Index" class="btn btn-outline-secondary">
+                    Annuler et retourner au catalogue
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,95 @@
+@model PanierViewModel
+@{
+    ViewData["Title"] = "Mon Panier";
+}
+
+<div class="container">
+    <h2 class="my-4">🛒 Mon Panier</h2>
+
+    @if (Model.Items.Any())
+    {
+        <div class="card shadow">
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead class="table-warning">
+                        <tr>
+                            <th>Article</th>
+                            <th>Type</th>
+                            <th class="text-center">Quantité</th>
+                            <th class="text-end">Prix unitaire</th>
+                            <th class="text-end">Sous-total</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.Items.Count; i++)
+                        {
+                            var item = Model.Items[i];
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="@item.Image" alt="@item.Nom" 
+                                             style="width: 50px; height: 50px; object-fit: cover;" 
+                                             class="rounded me-2"
+                                             onerror="this.src='https://via.placeholder.com/50?text=🍔'">
+                                        <span>@item.Nom</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge @(item.Type == "burger" ? "bg-danger" : "bg-success")">
+                                        @(item.Type == "burger" ? "🍔 Burger" : "🍟 Menu")
+                                    </span>
+                                </td>
+                                <td class="text-center">@item.Quantite</td>
+                                <td class="text-end">@item.Prix.ToString("N0") FCFA</td>
+                                <td class="text-end fw-bold">@((item.Prix * item.Quantite).ToString("N0")) FCFA</td>
+                                <td>
+                                    <form asp-action="SupprimerDuPanier" method="post" class="d-inline">
+                                        <input type="hidden" name="index" value="@i" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            🗑️
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr class="table-warning">
+                            <td colspan="4" class="text-end fw-bold fs-5">Total :</td>
+                            <td class="text-end fw-bold fs-5">@Model.Total.ToString("N0") FCFA</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <form asp-action="ViderPanier" method="post">
+                <button type="submit" class="btn btn-outline-danger">
+                    🗑️ Vider le panier
+                </button>
+            </form>
+
+            <div>
+                <a asp-controller="Catalogue" asp-action="Index" class="btn btn-outline-secondary me-2">
+                    ← Continuer les achats
+                </a>
+                <a asp-action="Valider" class="btn btn-warning btn-lg">
+                    Valider la commande →
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <h4 class="text-muted mb-4">Votre panier est vide</h4>
+            <p class="text-muted">Ajoutez des burgers ou des menus pour commencer !</p>
+            <a asp-controller="Catalogue" asp-action="Index" class="btn btn-warning btn-lg">
+                🍔 Voir le catalogue
+            </a>
+        </div>
+    }
+</div>

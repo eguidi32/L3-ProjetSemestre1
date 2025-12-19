@@ -1,0 +1,92 @@
+@model Commande
+@{
+    ViewData["Title"] = "Commande confirmée";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow mt-4">
+                <div class="card-body text-center py-5">
+                    <div class="mb-4">
+                        <span style="font-size: 80px;">🎉</span>
+                    </div>
+                    
+                    <h2 class="text-success mb-3">Commande confirmée !</h2>
+                    
+                    <p class="lead text-muted">
+                        Merci pour votre commande. Votre paiement a été effectué avec succès.
+                    </p>
+
+                    <div class="card bg-light my-4">
+                        <div class="card-body">
+                            <h5 class="card-title">📋 Détails de la commande</h5>
+                            
+                            <table class="table table-borderless mb-0">
+                                <tr>
+                                    <td class="text-muted">Numéro de commande :</td>
+                                    <td class="fw-bold">#@Model.Id</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Date :</td>
+                                    <td>@Model.DateCommande.ToString("dd/MM/yyyy HH:mm")</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Mode de livraison :</td>
+                                    <td>
+                                        @switch (Model.TypeLivraison)
+                                        {
+                                            case "sur_place":
+                                                <span>🍽️ Sur place</span>
+                                                break;
+                                            case "a_emporter":
+                                                <span>🥡 À emporter</span>
+                                                break;
+                                            case "livraison":
+                                                <span>🛵 Livraison - @Model.Zone?.Nom</span>
+                                                break;
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Montant payé :</td>
+                                    <td class="fw-bold text-warning fs-5">@Model.MontantTotal.ToString("N0") FCFA</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Référence paiement :</td>
+                                    <td><code>@Model.Paiement?.Reference</code></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Mode de paiement :</td>
+                                    <td>
+                                        @if (Model.Paiement?.ModePaiement == "Wave")
+                                        {
+                                            <span>🌊 Wave</span>
+                                        }
+                                        else
+                                        {
+                                            <span>🟠 Orange Money</span>
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Statut :</td>
+                                    <td><span class="badge bg-success">Validée</span></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <a asp-action="MesCommandes" class="btn btn-warning">
+                            📦 Voir mes commandes
+                        </a>
+                        <a asp-controller="Catalogue" asp-action="Index" class="btn btn-outline-secondary">
+                            🍔 Retour au catalogue
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
