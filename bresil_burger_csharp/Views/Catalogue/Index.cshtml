@@ -1,0 +1,117 @@
+@model CatalogueViewModel
+@{
+    ViewData["Title"] = "Catalogue";
+}
+
+<div class="container">
+    <h2 class="text-center my-4">🍔 Notre Catalogue</h2>
+    
+    <!-- Filtres -->
+    <div class="d-flex justify-content-center mb-4">
+        <div class="btn-group" role="group">
+            <a asp-action="Index" asp-route-filtre="tous" 
+               class="btn @(Model.Filtre == "tous" ? "btn-warning" : "btn-outline-warning")">
+                Tous
+            </a>
+            <a asp-action="Index" asp-route-filtre="burger" 
+               class="btn @(Model.Filtre == "burger" ? "btn-warning" : "btn-outline-warning")">
+                🍔 Burgers
+            </a>
+            <a asp-action="Index" asp-route-filtre="menu" 
+               class="btn @(Model.Filtre == "menu" ? "btn-warning" : "btn-outline-warning")">
+                🍟 Menus
+            </a>
+        </div>
+    </div>
+
+    <!-- Section Burgers -->
+    @if (Model.Filtre == "tous" || Model.Filtre == "burger")
+    {
+        <div class="mb-5">
+            @if (Model.Filtre == "tous")
+            {
+                <h3 class="mb-3">🍔 Nos Burgers</h3>
+            }
+            
+            @if (Model.Burgers.Any())
+            {
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    @foreach (var burger in Model.Burgers)
+                    {
+                        <div class="col">
+                            <div class="card h-100 shadow-sm">
+                                <img src="@burger.Image" class="card-img-top" alt="@burger.Nom" 
+                                     style="height: 200px; object-fit: cover;"
+                                     onerror="this.src='https://via.placeholder.com/300x200?text=Burger'">
+                                <div class="card-body">
+                                    <h5 class="card-title">@burger.Nom</h5>
+                                    <p class="card-text text-warning fw-bold fs-5">
+                                        @burger.Prix.ToString("N0") FCFA
+                                    </p>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <a asp-action="Burger" asp-route-id="@burger.Id" 
+                                       class="btn btn-warning w-100">
+                                        Voir détails
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="text-muted text-center">Aucun burger disponible pour le moment.</p>
+            }
+        </div>
+    }
+
+    <!-- Section Menus -->
+    @if (Model.Filtre == "tous" || Model.Filtre == "menu")
+    {
+        <div class="mb-5">
+            @if (Model.Filtre == "tous")
+            {
+                <h3 class="mb-3">🍟 Nos Menus</h3>
+            }
+            
+            @if (Model.Menus.Any())
+            {
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    @foreach (var menu in Model.Menus)
+                    {
+                        <div class="col">
+                            <div class="card h-100 shadow-sm">
+                                <img src="@menu.Image" class="card-img-top" alt="@menu.Nom"
+                                     style="height: 200px; object-fit: cover;"
+                                     onerror="this.src='https://via.placeholder.com/300x200?text=Menu'">
+                                <div class="card-body">
+                                    <h5 class="card-title">@menu.Nom</h5>
+                                    <p class="card-text small text-muted">
+                                        <i class="bi bi-check-circle"></i> @menu.Burger?.Nom<br>
+                                        <i class="bi bi-check-circle"></i> @menu.Boisson?.Nom<br>
+                                        <i class="bi bi-check-circle"></i> @menu.Frite?.Nom
+                                    </p>
+                                    <p class="card-text text-warning fw-bold fs-5">
+                                        @menu.Prix.ToString("N0") FCFA
+                                    </p>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <a asp-action="Menu" asp-route-id="@menu.Id" 
+                                       class="btn btn-warning w-100">
+                                        Voir détails
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="text-muted text-center">Aucun menu disponible pour le moment.</p>
+            }
+        </div>
+    }
+</div>
