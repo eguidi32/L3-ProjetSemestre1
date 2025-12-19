@@ -293,6 +293,59 @@ namespace bresil_burger_csharp.Controllers
             return View(commande);
         }
 
+                // GET: /Commande/MesCommandes
+        public async Task<IActionResult> MesCommandes()
+        {
+            var clientId = HttpContext.Session.GetInt32("ClientId");
+            if (clientId == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var commandes = await _context.Commandes
+                .Include(c => c.Paiement)
+                .Include(c => c.Zone)
+                .Where(c => c.ClientId == clientId)
+                .OrderByDescending(c => c.DateCommande)
+                .ToListAsync();
+
+            return View(commandes);
+        }
+
+        // GET: /Commande/Details/5
+        public async Task<IActionResult> Details(int id)
+        {
+            var clientId = HttpContext.Session.GetInt32("ClientId");
+            if (clientId == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var commande = await _context.Commandes
+                .Include(c => c.Paiement)
+                .Include(c => c.Zone)
+                .Include(c => c.LignesCommande)
+                    .ThenInclude(lc => lc.Burger)
+                .Include(c => c.LignesCommande)
+                    .ThenInclude(lc => lc.Menu)
+                        .ThenInclude(m => m!.Burger)
+                .Include(c => c.LignesCommande)
+                    .ThenInclude(lc => lc.Menu)
+                        .ThenInclude(m => m!.Boisson)
+                .Include(c => c.LignesCommande)
+                    .ThenInclude(lc => lc.Menu)
+                        .ThenInclude(m => m!.Frite)
+                .FirstOrDefaultAsync(c => c.Id == id && c.ClientId == clientId);
+
+            if (commande == null)
+            {
+                return NotFound();
+            }
+
+            return View(commande);
+        }
+
+
         // Méthodes helper pour le panier en session
         private List<PanierItem> GetPanier()
         {

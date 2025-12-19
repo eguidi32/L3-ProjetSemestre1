@@ -42,6 +42,14 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29tbWFuZGVcQ29uZmlybWF0aW9uLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/L3SemestreOne/bresil_burger_csharp/bresil_burger_csharp/Views/Commande/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29tbWFuZGVcRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/L3SemestreOne/bresil_burger_csharp/bresil_burger_csharp/Views/Commande/MesCommandes.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29tbWFuZGVcTWVzQ29tbWFuZGVzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/L3SemestreOne/bresil_burger_csharp/bresil_burger_csharp/Views/Commande/Paiement.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29tbWFuZGVcUGFpZW1lbnQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 

@@ -1,0 +1,100 @@
+@model List<Commande>
+@{
+    ViewData["Title"] = "Mes Commandes";
+}
+
+<div class="container">
+    <h2 class="my-4">📦 Mes Commandes</h2>
+
+    @if (Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-hover shadow-sm">
+                <thead class="table-warning">
+                    <tr>
+                        <th>N° Commande</th>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Montant</th>
+                        <th>Statut</th>
+                        <th>Paiement</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var commande in Model)
+                    {
+                        <tr>
+                            <td><strong>#@commande.Id</strong></td>
+                            <td>@commande.DateCommande.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                @switch (commande.TypeLivraison)
+                                {
+                                    case "sur_place":
+                                        <span class="badge bg-info">🍽️ Sur place</span>
+                                        break;
+                                    case "a_emporter":
+                                        <span class="badge bg-secondary">🥡 À emporter</span>
+                                        break;
+                                    case "livraison":
+                                        <span class="badge bg-primary">🛵 Livraison</span>
+                                        break;
+                                }
+                            </td>
+                            <td class="fw-bold">@commande.MontantTotal.ToString("N0") FCFA</td>
+                            <td>
+                                @switch (commande.Etat)
+                                {
+                                    case "en_attente":
+                                        <span class="badge bg-warning text-dark">⏳ En attente</span>
+                                        break;
+                                    case "validee":
+                                        <span class="badge bg-success">✅ Validée</span>
+                                        break;
+                                    case "en_preparation":
+                                        <span class="badge bg-info">👨‍🍳 En préparation</span>
+                                        break;
+                                    case "terminee":
+                                        <span class="badge bg-primary">🎉 Terminée</span>
+                                        break;
+                                    case "annulee":
+                                        <span class="badge bg-danger">❌ Annulée</span>
+                                        break;
+                                    default:
+                                        <span class="badge bg-secondary">@commande.Etat</span>
+                                        break;
+                                }
+                            </td>
+                            <td>
+                                @if (commande.Paiement != null)
+                                {
+                                    <span class="text-success">✅ Payée</span>
+                                }
+                                else
+                                {
+                                    <a asp-action="Paiement" asp-route-id="@commande.Id" class="btn btn-sm btn-warning">
+                                        💳 Payer
+                                    </a>
+                                }
+                            </td>
+                            <td>
+                                <a asp-action="Details" asp-route-id="@commande.Id" class="btn btn-sm btn-outline-primary">
+                                    Détails
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <h4 class="text-muted mb-4">Vous n'avez pas encore de commandes</h4>
+            <a asp-controller="Catalogue" asp-action="Index" class="btn btn-warning btn-lg">
+                🍔 Voir le catalogue
+            </a>
+        </div>
+    }
+</div>
