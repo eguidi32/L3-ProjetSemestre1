@@ -1,0 +1,80 @@
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "Inscription";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow mt-4">
+            <div class="card-header bg-warning text-dark text-center">
+                <h4 class="mb-0">🍔 Créer un compte</h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Register" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Nom" class="form-label">Nom</label>
+                            <input asp-for="Nom" class="form-control" placeholder="Votre nom" />
+                            <span asp-validation-for="Nom" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Prenom" class="form-label">Prénom</label>
+                            <input asp-for="Prenom" class="form-control" placeholder="Votre prénom" />
+                            <span asp-validation-for="Prenom" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label">Email</label>
+                        <input asp-for="Email" class="form-control" placeholder="votre@email.com" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label asp-for="Telephone" class="form-label">Téléphone</label>
+                        <input asp-for="Telephone" class="form-control" placeholder="77 123 45 67" />
+                        <span asp-validation-for="Telephone" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label asp-for="Adresse" class="form-label">Adresse</label>
+                        <input asp-for="Adresse" class="form-control" placeholder="Votre adresse" />
+                        <span asp-validation-for="Adresse" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="MotDePasse" class="form-label">Mot de passe</label>
+                            <input asp-for="MotDePasse" class="form-control" placeholder="••••••••" />
+                            <span asp-validation-for="MotDePasse" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="ConfirmMotDePasse" class="form-label">Confirmer</label>
+                            <input asp-for="ConfirmMotDePasse" class="form-control" placeholder="••••••••" />
+                            <span asp-validation-for="ConfirmMotDePasse" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-warning">S'inscrire</button>
+                    </div>
+                </form>
+                
+                <hr />
+                
+                <p class="text-center mb-0">
+                    Déjà un compte ? 
+                    <a asp-action="Login" class="text-warning">Se connecter</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
