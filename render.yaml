@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: bresil-burger-csharp
+    runtime: docker
+    repo: https://github.com/eguidi32/L3-ProjetSemestre1.git
+    branch: bresil_burger_csharp
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+    plan: free
