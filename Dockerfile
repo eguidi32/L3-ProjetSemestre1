@@ -18,10 +18,11 @@ RUN dotnet publish bresil_burger_csharp.csproj -c Release -o /app/publish /p:Use
 # Stage 3: Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
-EXPOSE 8080
+EXPOSE 10000
 COPY --from=publish /app/publish .
 
 # Configurer l'application pour écouter sur le port fourni par Render
-ENV ASPNETCORE_URLS=http://+:8080
+ENV PORT=10000
+ENV ASPNETCORE_URLS=http://+:10000
 
 ENTRYPOINT ["dotnet", "bresil_burger_csharp.dll"]
