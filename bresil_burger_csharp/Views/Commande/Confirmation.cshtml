@@ -9,7 +9,7 @@
             <div class="card shadow mt-4">
                 <div class="card-body text-center py-5">
                     <div class="mb-4">
-                        <span style="font-size: 80px;">🎉</span>
+                        <i class="bi bi-check-circle-fill text-success display-1"></i>
                     </div>
                     
                     <h2 class="text-success mb-3">Commande confirmée !</h2>
@@ -20,7 +20,7 @@
 
                     <div class="card bg-light my-4">
                         <div class="card-body">
-                            <h5 class="card-title">📋 Détails de la commande</h5>
+                            <h5 class="card-title"><i class="bi bi-receipt me-2"></i>Détails de la commande</h5>
                             
                             <table class="table table-borderless mb-0">
                                 <tr>
@@ -32,18 +32,18 @@
                                     <td>@Model.DateCommande.ToString("dd/MM/yyyy HH:mm")</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-muted">Mode de livraison :</td>
+                                    <td class="text-muted">Mode de service :</td>
                                     <td>
                                         @switch (Model.TypeLivraison)
                                         {
-                                            case "sur_place":
-                                                <span>🍽️ Sur place</span>
+                                            case "SUR_PLACE":
+                                                <span><i class="bi bi-shop me-1"></i> Sur place</span>
                                                 break;
-                                            case "a_emporter":
-                                                <span>🥡 À emporter</span>
+                                            case "A_EMPORTER":
+                                                <span><i class="bi bi-bag me-1"></i> À emporter</span>
                                                 break;
-                                            case "livraison":
-                                                <span>🛵 Livraison - @Model.Zone?.Nom</span>
+                                            case "LIVRAISON":
+                                                <span><i class="bi bi-truck me-1"></i> Livraison - @Model.Zone?.Nom</span>
                                                 break;
                                         }
                                     </td>
@@ -59,13 +59,13 @@
                                 <tr>
                                     <td class="text-muted">Mode de paiement :</td>
                                     <td>
-                                        @if (Model.Paiement?.ModePaiement == "Wave")
+                                        @if (Model.Paiement?.ModePaiement == "WAVE")
                                         {
-                                            <span>🌊 Wave</span>
+                                            <span><i class="bi bi-phone text-primary me-1"></i> Wave</span>
                                         }
                                         else
                                         {
-                                            <span>🟠 Orange Money</span>
+                                            <span><i class="bi bi-phone text-warning me-1"></i> Orange Money</span>
                                         }
                                     </td>
                                 </tr>
@@ -77,12 +77,51 @@
                         </div>
                     </div>
 
+                    @if (Model.LignesCommande != null && Model.LignesCommande.Any())
+                    {
+                        <div class="card bg-light my-4">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="bi bi-list-check me-2"></i>Produits commandés</h5>
+                                <div class="list-group list-group-flush">
+                                    @foreach (var ligne in Model.LignesCommande)
+                                    {
+                                        <div class="list-group-item bg-transparent">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <strong>
+                                                        @if (ligne.BurgerId.HasValue && ligne.Burger != null)
+                                                        {
+                                                            <i class="bi bi-egg-fried text-warning me-1"></i>
+                                                            @ligne.Burger.Nom
+                                                        }
+                                                        else if (ligne.MenuId.HasValue && ligne.Menu != null)
+                                                        {
+                                                            <i class="bi bi-box-seam text-warning me-1"></i>
+                                                            @ligne.Menu.Nom
+                                                        }
+                                                    </strong>
+                                                    <small class="text-muted ms-2">x @ligne.Quantite</small>
+                                                </div>
+                                                <span class="fw-bold">@ligne.SousTotal.ToString("N0") FCFA</span>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Votre commande est en cours de préparation. Vous recevrez une notification lorsqu'elle sera prête !
+                    </div>
+
                     <div class="d-grid gap-2">
                         <a asp-action="MesCommandes" class="btn btn-warning">
-                            📦 Voir mes commandes
+                            <i class="bi bi-bag-check me-2"></i> Voir mes commandes
                         </a>
                         <a asp-controller="Catalogue" asp-action="Index" class="btn btn-outline-secondary">
-                            🍔 Retour au catalogue
+                            <i class="bi bi-grid me-2"></i> Retour au catalogue
                         </a>
                     </div>
                 </div>

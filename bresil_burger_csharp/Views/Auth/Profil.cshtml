@@ -1,0 +1,77 @@
+@model Client
+@{
+    ViewData["Title"] = "Mon Profil";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0"><i class="bi bi-person-circle me-2"></i>Mon Profil</h4>
+                </div>
+                <div class="card-body">
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success">
+                            <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+                        </div>
+                    }
+
+                    <form asp-action="Profil" method="post">
+                        <div class="text-center mb-4">
+                            <div class="rounded-circle bg-warning d-inline-flex align-items-center justify-content-center" 
+                                 style="width: 100px; height: 100px;">
+                                <span class="fs-1 text-dark fw-bold">
+                                    @Model.Prenom?.Substring(0, 1).ToUpper()@Model.Nom?.Substring(0, 1).ToUpper()
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label"><i class="bi bi-person me-2"></i>Prénom</label>
+                            <input asp-for="Prenom" class="form-control" />
+                            <span asp-validation-for="Prenom" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label"><i class="bi bi-person me-2"></i>Nom</label>
+                            <input asp-for="Nom" class="form-control" />
+                            <span asp-validation-for="Nom" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label"><i class="bi bi-telephone me-2"></i>Téléphone</label>
+                            <input asp-for="Telephone" class="form-control" />
+                            <span asp-validation-for="Telephone" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label"><i class="bi bi-envelope me-2"></i>Email</label>
+                            <input asp-for="Email" class="form-control" readonly disabled />
+                            <small class="text-muted">L'email ne peut pas être modifié</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label"><i class="bi bi-calendar me-2"></i>Date d'inscription</label>
+                            <input value="@Model.DateInscription.ToString("dd/MM/yyyy")" class="form-control" readonly disabled />
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-check-circle me-2"></i>Enregistrer les modifications
+                            </button>
+                            <a asp-controller="Catalogue" asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Retour au catalogue
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

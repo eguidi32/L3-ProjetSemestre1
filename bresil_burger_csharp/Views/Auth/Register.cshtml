@@ -7,7 +7,7 @@
     <div class="col-md-8 col-lg-6">
         <div class="card shadow mt-4">
             <div class="card-header bg-warning text-dark text-center">
-                <h4 class="mb-0">🍔 Créer un compte</h4>
+                <h4 class="mb-0"><i class="bi bi-person-plus me-2"></i>Créer un compte</h4>
             </div>
             <div class="card-body">
                 <form asp-action="Register" method="post">
@@ -48,13 +48,13 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label asp-for="MotDePasse" class="form-label">Mot de passe</label>
-                            <input asp-for="MotDePasse" class="form-control" placeholder="••••••••" />
+                            <input asp-for="MotDePasse" class="form-control" placeholder="Mot de passe" />
                             <span asp-validation-for="MotDePasse" class="text-danger"></span>
                         </div>
                         
                         <div class="col-md-6 mb-3">
                             <label asp-for="ConfirmMotDePasse" class="form-label">Confirmer</label>
-                            <input asp-for="ConfirmMotDePasse" class="form-control" placeholder="••••••••" />
+                            <input asp-for="ConfirmMotDePasse" class="form-control" placeholder="Confirmer" />
                             <span asp-validation-for="ConfirmMotDePasse" class="text-danger"></span>
                         </div>
                     </div>
@@ -68,7 +68,7 @@
                 
                 <p class="text-center mb-0">
                     Déjà un compte ? 
-                    <a asp-action="Login" class="text-warning">Se connecter</a>
+                    <a asp-action="Login" class="text-warning fw-bold">Se connecter</a>
                 </p>
             </div>
         </div>

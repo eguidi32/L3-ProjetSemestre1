@@ -4,7 +4,22 @@
 }
 
 <div class="container">
-    <h2 class="my-4">📦 Mes Commandes</h2>
+    <h2 class="my-4"><i class="bi bi-bag-check me-2"></i>Mes Commandes</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-circle me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
 
     @if (Model.Any())
     {
@@ -30,14 +45,14 @@
                             <td>
                                 @switch (commande.TypeLivraison)
                                 {
-                                    case "sur_place":
-                                        <span class="badge bg-info">🍽️ Sur place</span>
+                                    case "SUR_PLACE":
+                                        <span class="badge bg-info"><i class="bi bi-shop me-1"></i> Sur place</span>
                                         break;
-                                    case "a_emporter":
-                                        <span class="badge bg-secondary">🥡 À emporter</span>
+                                    case "A_EMPORTER":
+                                        <span class="badge bg-secondary"><i class="bi bi-bag me-1"></i> À emporter</span>
                                         break;
-                                    case "livraison":
-                                        <span class="badge bg-primary">🛵 Livraison</span>
+                                    case "LIVRAISON":
+                                        <span class="badge bg-primary"><i class="bi bi-truck me-1"></i> Livraison</span>
                                         break;
                                 }
                             </td>
@@ -45,20 +60,20 @@
                             <td>
                                 @switch (commande.Etat)
                                 {
-                                    case "en_attente":
-                                        <span class="badge bg-warning text-dark">⏳ En attente</span>
+                                    case "EN_ATTENTE":
+                                        <span class="badge bg-warning text-dark">En attente</span>
                                         break;
-                                    case "validee":
-                                        <span class="badge bg-success">✅ Validée</span>
+                                    case "EN_PREPARATION":
+                                        <span class="badge bg-info">En préparation</span>
                                         break;
-                                    case "en_preparation":
-                                        <span class="badge bg-info">👨‍🍳 En préparation</span>
+                                    case "PRETE":
+                                        <span class="badge bg-success">Prête</span>
                                         break;
-                                    case "terminee":
-                                        <span class="badge bg-primary">🎉 Terminée</span>
+                                    case "TERMINEE":
+                                        <span class="badge bg-primary">Terminée</span>
                                         break;
-                                    case "annulee":
-                                        <span class="badge bg-danger">❌ Annulée</span>
+                                    case "ANNULEE":
+                                        <span class="badge bg-danger">Annulée</span>
                                         break;
                                     default:
                                         <span class="badge bg-secondary">@commande.Etat</span>
@@ -68,19 +83,30 @@
                             <td>
                                 @if (commande.Paiement != null)
                                 {
-                                    <span class="text-success">✅ Payée</span>
+                                    <span class="text-success"><i class="bi bi-check-circle me-1"></i> Payée</span>
                                 }
                                 else
                                 {
                                     <a asp-action="Paiement" asp-route-id="@commande.Id" class="btn btn-sm btn-warning">
-                                        💳 Payer
+                                        <i class="bi bi-credit-card me-1"></i> Payer
                                     </a>
                                 }
                             </td>
                             <td>
-                                <a asp-action="Details" asp-route-id="@commande.Id" class="btn btn-sm btn-outline-primary">
-                                    Détails
-                                </a>
+                                <div class="btn-group" role="group">
+                                    <a asp-action="Details" asp-route-id="@commande.Id" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye me-1"></i>Détails
+                                    </a>
+                                    @if (commande.Paiement == null && commande.Etat != "ANNULEE")
+                                    {
+                                        <form asp-action="Annuler" asp-route-id="@commande.Id" method="post" style="display: inline;" 
+                                              onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette commande ?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-x-circle me-1"></i>Annuler
+                                            </button>
+                                        </form>
+                                    }
+                                </div>
                             </td>
                         </tr>
                     }
@@ -91,9 +117,10 @@
     else
     {
         <div class="text-center py-5">
+            <i class="bi bi-bag-x display-1 text-muted mb-3"></i>
             <h4 class="text-muted mb-4">Vous n'avez pas encore de commandes</h4>
             <a asp-controller="Catalogue" asp-action="Index" class="btn btn-warning btn-lg">
-                🍔 Voir le catalogue
+                <i class="bi bi-grid me-2"></i> Voir le catalogue
             </a>
         </div>
     }

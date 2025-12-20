@@ -2,50 +2,205 @@
     ViewData["Title"] = "Accueil";
 }
 
+<style>
+    .bg-brasil {
+        background: linear-gradient(135deg, #FFCD29 0%, #ecdfb1 100%);
+    }
+    
+    .hero-section {
+        background: linear-gradient(135deg, #FFCD29 0%, #FFF2C7 100%);
+        position: relative;
+        overflow: hidden;
+        min-height: 500px;
+        margin: 0;
+        padding-top: 50px;
+    }
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%231a1a1a" fill-opacity="0.05" d="M0,96L48,112C96,128,192,160,288,165.3C384,171,480,149,576,128C672,107,768,85,864,90.7C960,96,1056,128,1152,133.3C1248,139,1344,117,1392,106.7L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+        background-size: cover;
+        background-position: bottom;
+    }
+    
+    .feature-card {
+        transition: all 0.3s ease;
+        border-radius: 15px;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2)!important;
+    }
+    
+    .stat-number {
+        font-size: 3rem;
+        font-weight: bold;
+        color: #2c2c2c;
+    }
+    
+    .step-circle {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #FFCD29 0%, #FFA500 100%);
+        box-shadow: 0 5px 15px rgba(255, 205, 41, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .step-circle:hover {
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 8px 25px rgba(255, 205, 41, 0.5);
+    }
+    
+    .promo-badge {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: #dc3545;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 25px;
+        font-weight: bold;
+        animation: pulse 2s infinite;
+    }
+    
+    @@keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    .testimonial-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+</style>
+
+@await Html.PartialAsync("_Notifications")
+
 <!-- Hero Section -->
-<div class="bg-warning py-5">
-    <div class="container text-center">
-        <h1 class="display-3 fw-bold text-dark">🍔 Brasil Burger</h1>
-        <p class="lead text-dark mb-4">Les meilleurs burgers de la ville, préparés avec amour !</p>
-        <a asp-controller="Catalogue" asp-action="Index" class="btn btn-danger btn-lg px-5">
-            Voir notre menu
-        </a>
+<div class="hero-section py-5">
+    <div class="container position-relative" style="z-index: 1;">
+        <div class="row align-items-center min-vh-50">
+            <div class="col-lg-6 text-center text-lg-start">
+                <span class="badge bg-danger mb-3 px-3 py-2"><i class="bi bi-fire me-1"></i> Nouveauté</span>
+                <h1 class="display-3 fw-bold text-dark mb-3">
+                    Brasil Burger
+                </h1>
+                <p class="lead text-dark mb-4">
+                    Les meilleurs burgers de Dakar, préparés avec des ingrédients frais et locaux. 
+                    Une explosion de saveurs dans chaque bouchée !
+                </p>
+                <div class="d-flex gap-3 justify-content-center justify-content-lg-start flex-wrap">
+                    <a asp-controller="Catalogue" asp-action="Index" class="btn btn-dark btn-lg px-4 shadow">
+                        <i class="bi bi-grid me-2"></i> Découvrir le menu
+                    </a>
+                    @if (Context.Session.GetInt32("ClientId") == null)
+                    {
+                        <a asp-controller="Auth" asp-action="Register" class="btn btn-outline-dark btn-lg px-4">
+                            <i class="bi bi-person-plus me-2"></i> S'inscrire
+                        </a>
+                    }
+                </div>
+                
+                <!-- Stats -->
+                <div class="row mt-5 text-center">
+                    <div class="col-4">
+                        <div class="stat-number">500+</div>
+                        <small class="text-muted fw-bold">Clients satisfaits</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-number">15+</div>
+                        <small class="text-muted fw-bold">Burgers au menu</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-number">4.8</div>
+                        <small class="text-muted fw-bold">Note moyenne</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 d-none d-lg-block text-center">
+                <div class="position-relative">
+                    <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&h=500&fit=crop" 
+                         alt="Burger" 
+                         class="img-fluid rounded-circle shadow-lg"
+                         style="max-width: 400px; border: 10px solid white;"
+                         onerror="this.src='https://via.placeholder.com/400x400/FFCD29/1a1a1a?text=Brasil+Burger'">
+                    <div class="promo-badge">
+                        -15%
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <!-- Features Section -->
 <div class="container py-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold mb-3">Pourquoi choisir Brasil Burger ?</h2>
+        <p class="text-muted">Découvrez ce qui fait de nous le meilleur choix pour vos envies de burgers</p>
+    </div>
+    
     <div class="row text-center g-4">
         <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="display-4 text-warning mb-3">🍔</div>
-                    <h4 class="card-title">Burgers Savoureux</h4>
+            <div class="card h-100 border-0 shadow-sm feature-card">
+                <div class="card-body py-5">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                         style="width: 80px; height: 80px; background: linear-gradient(135deg, #FFCD29 0%, #FFA500 100%);">
+                        <i class="bi bi-award fs-1 text-white"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Qualité Premium</h5>
                     <p class="card-text text-muted">
-                        Des burgers préparés avec des ingrédients frais et de qualité.
+                        Ingrédients frais et locaux, viande de première qualité sélectionnée par nos chefs
                     </p>
+                    <div class="mt-3">
+                        <span class="badge bg-success me-1">Viande locale</span>
+                        <span class="badge bg-success">Légumes frais</span>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="display-4 text-warning mb-3">🍟</div>
-                    <h4 class="card-title">Menus Complets</h4>
+            <div class="card h-100 border-0 shadow-sm feature-card">
+                <div class="card-body py-5">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                         style="width: 80px; height: 80px; background: linear-gradient(135deg, #FFCD29 0%, #FFA500 100%);">
+                        <i class="bi bi-clock-history fs-1 text-white"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Service Rapide</h5>
                     <p class="card-text text-muted">
-                        Burger + Frites + Boisson à prix avantageux !
+                        Commande prête en 15 minutes. Livraison rapide dans toute la ville
                     </p>
+                    <div class="mt-3">
+                        <span class="badge bg-info me-1">15 min</span>
+                        <span class="badge bg-info">Livraison rapide</span>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="display-4 text-warning mb-3">🛵</div>
-                    <h4 class="card-title">Livraison Rapide</h4>
+            <div class="card h-100 border-0 shadow-sm feature-card">
+                <div class="card-body py-5">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                         style="width: 80px; height: 80px; background: linear-gradient(135deg, #FFCD29 0%, #FFA500 100%);">
+                        <i class="bi bi-wallet2 fs-1 text-white"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Prix Abordables</h5>
                     <p class="card-text text-muted">
-                        Livraison dans toutes les zones de la ville !
+                        Menus à partir de 3500 FCFA. Paiement Wave et Orange Money acceptés
                     </p>
+                    <div class="mt-3">
+                        <span class="badge bg-warning text-dark me-1">Dès 3500 FCFA</span>
+                        <span class="badge bg-warning text-dark">Paiement mobile</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -53,18 +208,18 @@
 </div>
 
 <!-- CTA Section -->
-<div class="bg-danger text-white py-5">
+<div class="bg-dark text-white py-5">
     <div class="container text-center">
         <h2 class="mb-4">Prêt à commander ?</h2>
         <p class="lead mb-4">Créez un compte et commandez en quelques clics !</p>
-        <div class="d-flex justify-content-center gap-3">
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
             <a asp-controller="Catalogue" asp-action="Index" class="btn btn-warning btn-lg">
-                📋 Voir le catalogue
+                <i class="bi bi-grid me-2"></i> Voir le catalogue
             </a>
             @if (Context.Session.GetInt32("ClientId") == null)
             {
                 <a asp-controller="Auth" asp-action="Register" class="btn btn-outline-light btn-lg">
-                    📝 S'inscrire
+                    <i class="bi bi-person-plus me-2"></i> S'inscrire
                 </a>
             }
         </div>
@@ -73,35 +228,180 @@
 
 <!-- Comment ça marche -->
 <div class="container py-5">
-    <h2 class="text-center mb-5">Comment ça marche ?</h2>
+    <div class="text-center mb-5">
+        <h2 class="fw-bold mb-3">Comment ça marche ?</h2>
+        <p class="text-muted">Commandez en 4 étapes simples</p>
+    </div>
+    
     <div class="row g-4">
         <div class="col-md-3 text-center">
-            <div class="rounded-circle bg-warning d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                <span class="display-6 text-dark">1</span>
+            <div class="step-circle d-inline-flex align-items-center justify-content-center mb-3">
+                <span class="fs-2 fw-bold text-white">1</span>
             </div>
-            <h5>Choisissez</h5>
-            <p class="text-muted small">Parcourez notre catalogue de burgers et menus</p>
+            <h5 class="fw-bold">Parcourez</h5>
+            <p class="text-muted small">Explorez notre catalogue de burgers et menus savoureux</p>
+            <i class="bi bi-arrow-right text-warning fs-4 d-none d-md-inline"></i>
         </div>
         <div class="col-md-3 text-center">
-            <div class="rounded-circle bg-warning d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                <span class="display-6 text-dark">2</span>
+            <div class="step-circle d-inline-flex align-items-center justify-content-center mb-3">
+                <span class="fs-2 fw-bold text-white">2</span>
             </div>
-            <h5>Commandez</h5>
-            <p class="text-muted small">Ajoutez au panier et validez votre commande</p>
+            <h5 class="fw-bold">Sélectionnez</h5>
+            <p class="text-muted small">Ajoutez vos favoris au panier avec vos compléments</p>
+            <i class="bi bi-arrow-right text-warning fs-4 d-none d-md-inline"></i>
         </div>
         <div class="col-md-3 text-center">
-            <div class="rounded-circle bg-warning d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                <span class="display-6 text-dark">3</span>
+            <div class="step-circle d-inline-flex align-items-center justify-content-center mb-3">
+                <span class="fs-2 fw-bold text-white">3</span>
             </div>
-            <h5>Payez</h5>
-            <p class="text-muted small">Payez par Wave ou Orange Money</p>
+            <h5 class="fw-bold">Payez</h5>
+            <p class="text-muted small">Paiement sécurisé par Wave ou Orange Money</p>
+            <i class="bi bi-arrow-right text-warning fs-4 d-none d-md-inline"></i>
         </div>
         <div class="col-md-3 text-center">
-            <div class="rounded-circle bg-warning d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                <span class="display-6 text-dark">4</span>
+            <div class="step-circle d-inline-flex align-items-center justify-content-center mb-3">
+                <span class="fs-2 fw-bold text-white">4</span>
             </div>
-            <h5>Savourez</h5>
-            <p class="text-muted small">Sur place, à emporter ou livré chez vous !</p>
+            <h5 class="fw-bold">Régalez-vous</h5>
+            <p class="text-muted small">Récupérez ou faites-vous livrer et savourez !</p>
+        </div>
+    </div>
+</div>
+
+<!-- Témoignages -->
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold mb-3">Ce que disent nos clients</h2>
+            <p class="text-muted">Plus de 500 clients satisfaits !</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="testimonial-card">
+                    <div class="mb-3">
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <i class="bi bi-star-fill text-warning"></i>
+                    </div>
+                    <p class="mb-3 fst-italic">
+                        "Les meilleurs burgers de Dakar ! La viande est toujours parfaitement cuite et les ingrédients sont frais. Je recommande le Brasil Classic !"
+                    </p>
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-warning text-white d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                            <span class="fw-bold">AM</span>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">Amadou M.</h6>
+                            <small class="text-muted">Client régulier</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="testimonial-card">
+                    <div class="mb-3">
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <i class="bi bi-star-fill text-warning"></i>
+                    </div>
+                    <p class="mb-3 fst-italic">
+                        "Livraison ultra rapide et burger encore chaud ! Le menu est complet et le prix très correct. Je commande maintenant toutes les semaines."
+                    </p>
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-warning text-white d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                            <span class="fw-bold">FS</span>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">Fatou S.</h6>
+                            <small class="text-muted">Cliente depuis 2024</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="testimonial-card">
+                    <div class="mb-3">
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <i class="bi bi-star-fill text-warning"></i>
+                    </div>
+                    <p class="mb-3 fst-italic">
+                        "Service impeccable ! J'adore pouvoir payer avec Wave. Les portions sont généreuses et le goût est au rendez-vous à chaque fois."
+                    </p>
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-warning text-white d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                            <span class="fw-bold">ID</span>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">Ibrahima D.</h6>
+                            <small class="text-muted">Client fidèle</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Horaires et Contact -->
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <h4 class="card-title mb-4">
+                            <i class="bi bi-clock text-warning me-2"></i>
+                            Horaires d'ouverture
+                        </h4>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2">
+                                <strong>Lundi - Vendredi :</strong>
+                                <span class="float-end">11h00 - 22h00</span>
+                            </li>
+                            <li class="mb-2">
+                                <strong>Samedi - Dimanche :</strong>
+                                <span class="float-end">12h00 - 23h00</span>
+                            </li>
+                            <li class="mt-3 text-muted small">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Dernière commande 30 minutes avant la fermeture
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <h4 class="card-title mb-4">
+                            <i class="bi bi-geo-alt text-warning me-2"></i>
+                            Contact & Localisation
+                        </h4>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2">
+                                <i class="bi bi-telephone me-2"></i>
+                                <strong>Téléphone :</strong> +221 77 123 45 67
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-envelope me-2"></i>
+                                <strong>Email :</strong> contact@brasilburger.sn
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-pin-map me-2"></i>
+                                <strong>Adresse :</strong> Dakar, Sénégal
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

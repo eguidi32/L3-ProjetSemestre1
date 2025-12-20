@@ -113,7 +113,8 @@ namespace bresil_burger_csharp.Controllers
         // GET: /Commande/Valider
         public async Task<IActionResult> Valider()
         {
-            if (HttpContext.Session.GetInt32("ClientId") == null)
+            var clientId = HttpContext.Session.GetInt32("ClientId");
+            if (clientId == null)
             {
                 return RedirectToAction("Login", "Auth");
             }
@@ -125,11 +126,17 @@ namespace bresil_burger_csharp.Controllers
             }
 
             var zones = await _context.Zones.ToListAsync();
+            
+            // Récupérer l'adresse du client
+            var client = await _context.Clients.FindAsync(clientId);
+            var adresseClient = client?.Adresse;
 
             var viewModel = new ValidationCommandeViewModel
             {
                 Panier = new PanierViewModel { Items = panier },
-                Zones = zones
+                Zones = zones,
+                AdresseEnregistree = adresseClient,
+                UtiliserAdresseEnregistree = !string.IsNullOrEmpty(adresseClient)
             };
 
             return View(viewModel);
@@ -147,54 +154,120 @@ namespace bresil_burger_csharp.Controllers
             }
 
             var panier = GetPanier();
-            if (!panier.Any())
+            if (panier == null || !panier.Any())
             {
+                TempData["Error"] = "Votre panier est vide";
                 return RedirectToAction("Panier");
             }
 
+            // Préparer les données avec les prix depuis la BD
+            var lignesData = new List<(int Id, string Type, int Quantite, decimal PrixUnitaire, List<int> ComplementIds)>();
+            decimal montantTotal = 0;
+
+            foreach (var item in panier)
+            {
+                decimal prixUnitaire = 0;
+                
+                if (item.Type == "burger")
+                {
+                    var burger = await _context.Burgers.FindAsync(item.Id);
+                    if (burger != null)
+                    {
+                        prixUnitaire = burger.Prix;
+                        if (item.ComplementIds != null && item.ComplementIds.Any())
+                        {
+                            var complements = await _context.Complements
+                                .Where(c => item.ComplementIds.Contains(c.Id))
+                                .ToListAsync();
+                            prixUnitaire += complements.Sum(c => c.Prix);
+                        }
+                        Console.WriteLine($"DEBUG - Burger {item.Id}: {burger.Nom} - Prix: {burger.Prix}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"DEBUG - Burger {item.Id} NOT FOUND in database!");
+                    }
+                }
+                else if (item.Type == "menu")
+                {
+                    var menu = await _context.Menus.FindAsync(item.Id);
+                    if (menu != null)
+                    {
+                        prixUnitaire = menu.Prix;
+                    }
+                }
+
+                if (prixUnitaire > 0)
+                {
+                    lignesData.Add((item.Id, item.Type, item.Quantite, prixUnitaire, item.ComplementIds ?? new List<int>()));
+                    montantTotal += prixUnitaire * item.Quantite;
+                }
+            }
+
+            if (montantTotal <= 0 || !lignesData.Any())
+            {
+                TempData["Error"] = "Impossible de calculer le montant de la commande";
+                return RedirectToAction("Panier");
+            }
+
+            // Frais de livraison
             decimal fraisLivraison = 0;
-            if (model.TypeLivraison == "livraison" && model.ZoneId.HasValue)
+            if (model.TypeLivraison == "LIVRAISON" && model.ZoneId.HasValue)
             {
                 var zone = await _context.Zones.FindAsync(model.ZoneId.Value);
                 fraisLivraison = zone?.PrixLivraison ?? 0;
             }
 
+            // Calculer le montant total final
+            var montantTotalFinal = montantTotal + fraisLivraison;
+            
+            // Vérifier que le montant est valide
+            if (montantTotalFinal <= 0)
+            {
+                TempData["Error"] = "Impossible de calculer le montant de votre commande. Veuillez vérifier votre panier.";
+                return RedirectToAction("Panier");
+            }
+
+            // Créer la commande avec initialisation d'objet
             var commande = new Commande
             {
                 ClientId = clientId.Value,
-                DateCommande = DateTime.Now,
-                Etat = "en_attente",
-                TypeLivraison = model.TypeLivraison,
-                ZoneId = model.TypeLivraison == "livraison" ? model.ZoneId : null,
-                MontantTotal = panier.Sum(i => i.Prix * i.Quantite) + fraisLivraison
+                Numero = $"CMD-{DateTime.UtcNow:yyyyMMddHHmmss}-{clientId}",
+                DateCommande = DateTime.UtcNow,
+                Etat = "EN_ATTENTE",
+                TypeLivraison = string.IsNullOrEmpty(model.TypeLivraison) ? "SUR_PLACE" : model.TypeLivraison,
+                ZoneId = model.TypeLivraison == "LIVRAISON" ? model.ZoneId : null,
+                MontantTotal = montantTotalFinal
             };
-
+            
             _context.Commandes.Add(commande);
             await _context.SaveChangesAsync();
 
-            foreach (var item in panier)
+            // Créer les lignes de commande
+            foreach (var ligne in lignesData)
             {
                 var ligneCommande = new LigneCommande
                 {
                     CommandeId = commande.Id,
-                    BurgerId = item.Type == "burger" ? item.Id : null,
-                    MenuId = item.Type == "menu" ? item.Id : null,
-                    Quantite = item.Quantite,
-                    PrixUnitaire = item.Prix
+                    BurgerId = ligne.Type == "burger" ? ligne.Id : null,
+                    MenuId = ligne.Type == "menu" ? ligne.Id : null,
+                    Quantite = ligne.Quantite,
+                    PrixUnitaire = ligne.PrixUnitaire,
+                    SousTotal = ligne.PrixUnitaire * ligne.Quantite,
+                    TypeProduit = ligne.Type == "burger" ? "BURGER" : "MENU"
                 };
 
                 _context.LignesCommande.Add(ligneCommande);
                 await _context.SaveChangesAsync();
 
-                if (item.Type == "burger" && item.ComplementIds.Any())
+                if (ligne.Type == "burger" && ligne.ComplementIds.Any())
                 {
-                    foreach (var compId in item.ComplementIds)
+                    foreach (var compId in ligne.ComplementIds)
                     {
                         var ligneComplement = new LigneCommandeComplement
                         {
                             LigneCommandeId = ligneCommande.Id,
                             ComplementId = compId,
-                            Quantite = 1
                         };
                         _context.LignesCommandeComplement.Add(ligneComplement);
                     }
@@ -260,12 +333,12 @@ namespace bresil_burger_csharp.Controllers
                 CommandeId = commandeId,
                 Montant = commande.MontantTotal,
                 ModePaiement = modePaiement,
-                Reference = $"{modePaiement.ToUpper()}-{DateTime.Now:yyyyMMddHHmmss}-{commandeId}",
-                DatePaiement = DateTime.Now
+                Reference = $"{modePaiement.ToUpper()}-{DateTime.UtcNow:yyyyMMddHHmmss}-{commandeId}",
+                DatePaiement = DateTime.UtcNow
             };
 
             _context.Paiements.Add(paiement);
-            commande.Etat = "validee";
+            commande.Etat = "EN_PREPARATION";
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Confirmation", new { id = commandeId });
@@ -283,6 +356,10 @@ namespace bresil_burger_csharp.Controllers
             var commande = await _context.Commandes
                 .Include(c => c.Paiement)
                 .Include(c => c.Zone)
+                .Include(c => c.LignesCommande)
+                    .ThenInclude(lc => lc.Burger)
+                .Include(c => c.LignesCommande)
+                    .ThenInclude(lc => lc.Menu)
                 .FirstOrDefaultAsync(c => c.Id == id && c.ClientId == clientId);
 
             if (commande == null)
@@ -343,6 +420,49 @@ namespace bresil_burger_csharp.Controllers
             }
 
             return View(commande);
+        }
+
+        // POST: /Commande/Annuler/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Annuler(int id)
+        {
+            var clientId = HttpContext.Session.GetInt32("ClientId");
+            if (clientId == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var commande = await _context.Commandes
+                .Include(c => c.Paiement)
+                .FirstOrDefaultAsync(c => c.Id == id && c.ClientId == clientId);
+
+            if (commande == null)
+            {
+                TempData["Error"] = "Commande non trouvée";
+                return RedirectToAction("MesCommandes");
+            }
+
+            // Vérifier que la commande n'est pas déjà payée
+            if (commande.Paiement != null)
+            {
+                TempData["Error"] = "Impossible d'annuler une commande déjà payée";
+                return RedirectToAction("MesCommandes");
+            }
+
+            // Vérifier que la commande n'est pas déjà annulée
+            if (commande.Etat == "ANNULEE")
+            {
+                TempData["Error"] = "Cette commande est déjà annulée";
+                return RedirectToAction("MesCommandes");
+            }
+
+            // Annuler la commande
+            commande.Etat = "ANNULEE";
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = $"Commande #{commande.Id} annulée avec succès";
+            return RedirectToAction("MesCommandes");
         }
 
 

@@ -12,11 +12,10 @@
     </nav>
 
     <div class="row mt-4">
-        <!-- Informations générales -->
         <div class="col-md-6">
             <div class="card shadow mb-4">
                 <div class="card-header bg-warning text-dark">
-                    <h5 class="mb-0">📋 Commande #@Model.Id</h5>
+                    <h5 class="mb-0"><i class="bi bi-receipt me-2"></i>Commande #@Model.Id</h5>
                 </div>
                 <div class="card-body">
                     <table class="table table-borderless mb-0">
@@ -29,14 +28,14 @@
                             <td>
                                 @switch (Model.TypeLivraison)
                                 {
-                                    case "sur_place":
-                                        <span>🍽️ Sur place</span>
+                                    case "SUR_PLACE":
+                                        <span><i class="bi bi-shop me-1"></i> Sur place</span>
                                         break;
-                                    case "a_emporter":
-                                        <span>🥡 À emporter</span>
+                                    case "A_EMPORTER":
+                                        <span><i class="bi bi-bag me-1"></i> À emporter</span>
                                         break;
-                                    case "livraison":
-                                        <span>🛵 Livraison - @Model.Zone?.Nom</span>
+                                    case "LIVRAISON":
+                                        <span><i class="bi bi-truck me-1"></i> Livraison - @Model.Zone?.Nom</span>
                                         break;
                                 }
                             </td>
@@ -46,20 +45,20 @@
                             <td>
                                 @switch (Model.Etat)
                                 {
-                                    case "en_attente":
-                                        <span class="badge bg-warning text-dark">⏳ En attente de paiement</span>
+                                    case "EN_ATTENTE":
+                                        <span class="badge bg-warning text-dark">En attente de paiement</span>
                                         break;
-                                    case "validee":
-                                        <span class="badge bg-success">✅ Validée</span>
+                                    case "EN_PREPARATION":
+                                        <span class="badge bg-info">En préparation</span>
                                         break;
-                                    case "en_preparation":
-                                        <span class="badge bg-info">👨‍🍳 En préparation</span>
+                                    case "PRETE":
+                                        <span class="badge bg-success">Prête</span>
                                         break;
-                                    case "terminee":
-                                        <span class="badge bg-primary">🎉 Terminée</span>
+                                    case "TERMINEE":
+                                        <span class="badge bg-primary">Terminée</span>
                                         break;
-                                    case "annulee":
-                                        <span class="badge bg-danger">❌ Annulée</span>
+                                    case "ANNULEE":
+                                        <span class="badge bg-danger">Annulée</span>
                                         break;
                                 }
                             </td>
@@ -72,25 +71,24 @@
                 </div>
             </div>
 
-            <!-- Paiement -->
             @if (Model.Paiement != null)
             {
                 <div class="card shadow mb-4">
                     <div class="card-header bg-success text-white">
-                        <h5 class="mb-0">💳 Paiement</h5>
+                        <h5 class="mb-0"><i class="bi bi-credit-card me-2"></i>Paiement</h5>
                     </div>
                     <div class="card-body">
                         <table class="table table-borderless mb-0">
                             <tr>
                                 <td class="text-muted">Mode :</td>
                                 <td>
-                                    @if (Model.Paiement.ModePaiement == "Wave")
+                                    @if (Model.Paiement.ModePaiement == "WAVE")
                                     {
-                                        <span>🌊 Wave</span>
+                                        <span><i class="bi bi-phone text-primary me-1"></i> Wave</span>
                                     }
                                     else
                                     {
-                                        <span>🟠 Orange Money</span>
+                                        <span><i class="bi bi-phone text-warning me-1"></i> Orange Money</span>
                                     }
                                 </td>
                             </tr>
@@ -108,11 +106,10 @@
             }
         </div>
 
-        <!-- Articles commandés -->
         <div class="col-md-6">
             <div class="card shadow">
                 <div class="card-header bg-warning text-dark">
-                    <h5 class="mb-0">🛒 Articles commandés</h5>
+                    <h5 class="mb-0"><i class="bi bi-cart me-2"></i>Articles commandés</h5>
                 </div>
                 <div class="card-body">
                     @if (Model.LignesCommande.Any())
@@ -149,7 +146,7 @@
 
     <div class="mt-4">
         <a asp-action="MesCommandes" class="btn btn-outline-secondary">
-            ← Retour à mes commandes
+            <i class="bi bi-arrow-left me-1"></i> Retour à mes commandes
         </a>
     </div>
 </div>

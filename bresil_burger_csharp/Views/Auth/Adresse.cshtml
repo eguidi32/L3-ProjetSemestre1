@@ -1,0 +1,70 @@
+@model Client
+@{
+    ViewData["Title"] = "Mon Adresse";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0"><i class="bi bi-geo-alt me-2"></i>Mon Adresse</h4>
+                </div>
+                <div class="card-body">
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success">
+                            <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+                        </div>
+                    }
+
+                    <form asp-action="Adresse" method="post">
+                        <div class="text-center mb-4">
+                            <div class="rounded-circle bg-warning d-inline-flex align-items-center justify-content-center" 
+                                 style="width: 80px; height: 80px;">
+                                <i class="bi bi-geo-alt fs-1 text-dark"></i>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Cette adresse sera utilisée par défaut pour vos livraisons.
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label"><i class="bi bi-house me-2"></i>Adresse complète</label>
+                            <textarea asp-for="Adresse" class="form-control" rows="4" 
+                                      placeholder="Ex: Quartier Médina, Rue 12, Porte 45, Dakar"></textarea>
+                            <span asp-validation-for="Adresse" class="text-danger"></span>
+                            <small class="text-muted">Indiquez votre quartier, rue, numéro de porte et tout autre repère utile</small>
+                        </div>
+
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <h6 class="card-title"><i class="bi bi-lightbulb text-warning me-2"></i>Conseils</h6>
+                                <ul class="small text-muted mb-0">
+                                    <li>Indiquez un point de repère proche (école, mosquée, boutique...)</li>
+                                    <li>Ajoutez votre numéro de téléphone si différent</li>
+                                    <li>Précisez l'étage si vous êtes dans un immeuble</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-check-circle me-2"></i>Enregistrer l'adresse
+                            </button>
+                            <a asp-action="Profil" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Retour au profil
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

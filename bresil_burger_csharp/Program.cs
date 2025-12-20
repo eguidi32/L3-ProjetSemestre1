@@ -4,7 +4,7 @@ using bresil_burger_csharp.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure Kestrel to listen on the port provided by Render
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
 builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
 // Configuration de la base de données PostgreSQL

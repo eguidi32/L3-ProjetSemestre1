@@ -3,72 +3,60 @@
     ViewData["Title"] = "Paiement";
 }
 
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card shadow mt-4">
-                <div class="card-header bg-warning text-dark text-center">
-                    <h4 class="mb-0">💳 Paiement de la commande #@Model.Id</h4>
+<div class="container py-4">
+    <h2 class="mb-4"><i class="bi bi-credit-card me-2"></i>Paiement de la commande</h2>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-receipt me-2"></i>Récapitulatif</h5>
                 </div>
                 <div class="card-body">
-                    <!-- Récapitulatif -->
-                    <div class="alert alert-info">
-                        <h6 class="mb-2">📋 Récapitulatif</h6>
-                        <div class="d-flex justify-content-between">
-                            <span>Type de livraison :</span>
-                            <strong>
-                                @switch (Model.TypeLivraison)
-                                {
-                                    case "sur_place":
-                                        <span>🍽️ Sur place</span>
-                                        break;
-                                    case "a_emporter":
-                                        <span>🥡 À emporter</span>
-                                        break;
-                                    case "livraison":
-                                        <span>🛵 Livraison - @Model.Zone?.Nom</span>
-                                        break;
-                                }
-                            </strong>
-                        </div>
-                        <hr>
-                        <div class="d-flex justify-content-between fs-5">
-                            <span>Montant total :</span>
-                            <strong class="text-warning">@Model.MontantTotal.ToString("N0") FCFA</strong>
-                        </div>
-                    </div>
+                    <p><strong>Commande N°:</strong> @Model.Numero</p>
+                    <p><strong>Date:</strong> @Model.DateCommande.ToString("dd/MM/yyyy HH:mm")</p>
+                    <p><strong>Mode:</strong> @Model.TypeLivraison</p>
+                    @if (Model.Zone != null)
+                    {
+                        <p><strong>Zone:</strong> @Model.Zone.Nom</p>
+                        <p><strong>Frais livraison:</strong> @Model.Zone.PrixLivraison.ToString("N0") FCFA</p>
+                    }
+                    <hr>
+                    <p class="fs-4 fw-bold text-warning">
+                        Total à payer: @Model.MontantTotal.ToString("N0") FCFA
+                    </p>
+                </div>
+            </div>
+        </div>
 
-                    <!-- Formulaire de paiement -->
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-wallet2 me-2"></i>Mode de paiement</h5>
+                </div>
+                <div class="card-body">
                     <form asp-action="EffectuerPaiement" method="post">
                         <input type="hidden" name="commandeId" value="@Model.Id" />
-
+                        
                         <div class="mb-4">
-                            <label class="form-label fw-bold">Mode de paiement</label>
+                            <label class="form-label fw-bold">Choisissez votre mode de paiement</label>
                             
-                            <div class="d-grid gap-2">
-                                <div class="form-check border rounded p-3">
-                                    <input class="form-check-input" type="radio" name="modePaiement" 
-                                           id="wave" value="Wave" checked>
-                                    <label class="form-check-label d-flex align-items-center" for="wave">
-                                        <span class="fs-4 me-2">🌊</span>
-                                        <div>
-                                            <strong>Wave</strong>
-                                            <small class="text-muted d-block">Paiement mobile Wave</small>
-                                        </div>
-                                    </label>
-                                </div>
-                                
-                                <div class="form-check border rounded p-3">
-                                    <input class="form-check-input" type="radio" name="modePaiement" 
-                                           id="om" value="OM">
-                                    <label class="form-check-label d-flex align-items-center" for="om">
-                                        <span class="fs-4 me-2">🟠</span>
-                                        <div>
-                                            <strong>Orange Money</strong>
-                                            <small class="text-muted d-block">Paiement mobile OM</small>
-                                        </div>
-                                    </label>
-                                </div>
+                            <div class="form-check mb-3 p-3 border rounded">
+                                <input class="form-check-input" type="radio" name="modePaiement" 
+                                       id="wave" value="WAVE" checked>
+                                <label class="form-check-label d-flex align-items-center" for="wave">
+                                    <span class="badge bg-primary me-2 fs-6 px-3 py-2">Wave</span>
+                                    <span class="text-muted">Paiement mobile Wave</span>
+                                </label>
+                            </div>
+                            
+                            <div class="form-check mb-3 p-3 border rounded">
+                                <input class="form-check-input" type="radio" name="modePaiement" 
+                                       id="orangeMoney" value="ORANGE_MONEY">
+                                <label class="form-check-label d-flex align-items-center" for="orangeMoney">
+                                    <span class="badge me-2 fs-6 px-3 py-2" style="background-color: #ff6600;">Orange Money</span>
+                                    <span class="text-muted">Paiement mobile Orange</span>
+                                </label>
                             </div>
                         </div>
 
@@ -76,23 +64,76 @@
                             <label for="telephone" class="form-label">Numéro de téléphone</label>
                             <input type="tel" class="form-control" id="telephone" name="telephone" 
                                    placeholder="77 123 45 67" required>
-                            <small class="text-muted">Le numéro associé à votre compte Wave ou OM</small>
+                            <small class="text-muted">Numéro pour le paiement mobile</small>
                         </div>
 
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-warning btn-lg">
-                                ✅ Confirmer le paiement
-                            </button>
-                        </div>
+                        <hr>
+
+                        <button type="submit" class="btn btn-warning btn-lg w-100">
+                            <i class="bi bi-check-circle me-2"></i> Confirmer le paiement
+                        </button>
                     </form>
                 </div>
             </div>
 
-            <div class="text-center mt-3">
-                <a asp-controller="Catalogue" asp-action="Index" class="btn btn-outline-secondary">
-                    Annuler et retourner au catalogue
+            <div class="mt-3">
+                <a asp-action="Panier" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Retour
                 </a>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        // Validation du formulaire de paiement
+        (function() {
+            'use strict';
+            
+            const form = document.querySelector('form');
+            const telephoneInput = document.getElementById('telephone');
+            
+            // Validation du numéro de téléphone sénégalais
+            telephoneInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                
+                // Format automatique: XX XXX XX XX
+                if (value.length > 2 && value.length <= 5) {
+                    value = value.slice(0, 2) + ' ' + value.slice(2);
+                } else if (value.length > 5 && value.length <= 7) {
+                    value = value.slice(0, 2) + ' ' + value.slice(2, 5) + ' ' + value.slice(5);
+                } else if (value.length > 7) {
+                    value = value.slice(0, 2) + ' ' + value.slice(2, 5) + ' ' + value.slice(5, 7) + ' ' + value.slice(7, 9);
+                }
+                
+                e.target.value = value;
+            });
+            
+            form.addEventListener('submit', function(e) {
+                const telephone = telephoneInput.value.replace(/\D/g, '');
+                const modePaiement = document.querySelector('input[name="modePaiement"]:checked').value;
+                
+                // Validation du téléphone (doit commencer par 77, 78, 76, 70 et avoir 9 chiffres)
+                if (!/^(77|78|76|70)\d{7}$/.test(telephone)) {
+                    e.preventDefault();
+                    alert('Veuillez entrer un numéro de téléphone sénégalais valide (77, 78, 76 ou 70 suivi de 7 chiffres)');
+                    telephoneInput.focus();
+                    return false;
+                }
+                
+                // Confirmation avant soumission
+                const message = `Vous allez payer ${document.querySelector('.fs-4.fw-bold').textContent.split(':')[1].trim()} via ${modePaiement === 'WAVE' ? 'Wave' : 'Orange Money'}.\nConfirmez-vous ?`;
+                if (!confirm(message)) {
+                    e.preventDefault();
+                    return false;
+                }
+                
+                // Afficher un message de chargement
+                const btn = form.querySelector('button[type="submit"]');
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Traitement en cours...';
+                btn.disabled = true;
+            });
+        })();
+    </script>
+}

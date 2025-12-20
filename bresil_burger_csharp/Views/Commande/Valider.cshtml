@@ -1,17 +1,23 @@
 @model ValidationCommandeViewModel
 @{
     ViewData["Title"] = "Valider la commande";
+    // Créer un dictionnaire JSON des zones et leurs quartiers
+    var zonesData = Model.Zones.Select(z => new { 
+        id = z.Id, 
+        nom = z.Nom, 
+        prix = z.PrixLivraison,
+        quartiers = z.Quartiers?.ToLower() ?? ""
+    }).ToList();
 }
 
 <div class="container">
-    <h2 class="my-4">✅ Validation de la commande</h2>
+    <h2 class="my-4"><i class="bi bi-check-circle me-2"></i>Validation de la commande</h2>
 
     <div class="row">
-        <!-- Récapitulatif -->
         <div class="col-md-7">
             <div class="card shadow mb-4">
                 <div class="card-header bg-warning text-dark">
-                    <h5 class="mb-0">📋 Récapitulatif</h5>
+                    <h5 class="mb-0"><i class="bi bi-receipt me-2"></i>Récapitulatif</h5>
                 </div>
                 <div class="card-body">
                     <table class="table">
@@ -49,56 +55,126 @@
             </div>
         </div>
 
-        <!-- Options de livraison -->
         <div class="col-md-5">
             <div class="card shadow">
                 <div class="card-header bg-warning text-dark">
-                    <h5 class="mb-0">🚗 Mode de livraison</h5>
+                    <h5 class="mb-0"><i class="bi bi-truck me-2"></i>Mode de livraison</h5>
                 </div>
                 <div class="card-body">
                     <form asp-action="Confirmer" method="post">
                         <div class="mb-3">
                             <div class="form-check mb-2">
                                 <input class="form-check-input" type="radio" name="TypeLivraison" 
-                                       id="surPlace" value="sur_place" checked onchange="updateLivraison()">
+                                       id="surPlace" value="SUR_PLACE" checked onchange="updateLivraison()">
                                 <label class="form-check-label" for="surPlace">
-                                    🍽️ Sur place
+                                    <i class="bi bi-shop me-1"></i> Sur place
                                 </label>
                             </div>
                             <div class="form-check mb-2">
                                 <input class="form-check-input" type="radio" name="TypeLivraison" 
-                                       id="aEmporter" value="a_emporter" onchange="updateLivraison()">
+                                       id="aEmporter" value="A_EMPORTER" onchange="updateLivraison()">
                                 <label class="form-check-label" for="aEmporter">
-                                    🥡 À emporter
+                                    <i class="bi bi-bag me-1"></i> À emporter
                                 </label>
                             </div>
                             <div class="form-check mb-2">
                                 <input class="form-check-input" type="radio" name="TypeLivraison" 
-                                       id="livraison" value="livraison" onchange="updateLivraison()">
+                                       id="livraison" value="LIVRAISON" onchange="updateLivraison()">
                                 <label class="form-check-label" for="livraison">
-                                    🛵 Livraison
+                                    <i class="bi bi-truck me-1"></i> Livraison
                                 </label>
                             </div>
                         </div>
 
-                        <!-- Zone de livraison -->
-                        <div class="mb-3" id="zoneSelection" style="display: none;">
-                            <label for="ZoneId" class="form-label">Zone de livraison</label>
-                            <select class="form-select" name="ZoneId" id="ZoneId" onchange="updateFrais()">
-                                <option value="">-- Choisir une zone --</option>
-                                @foreach (var zone in Model.Zones)
+                        <!-- Section Livraison (cachée par défaut) -->
+                        <div id="livraisonSection" style="display: none;">
+                            <!-- Saisie du quartier -->
+                            <div class="mb-3">
+                                <label for="quartierInput" class="form-label fw-bold">
+                                    <i class="bi bi-geo-alt me-1"></i>Votre quartier
+                                </label>
+                                <input type="text" class="form-control" id="quartierInput" name="Quartier"
+                                       placeholder="Ex: Fass, Colobane, Medina..." oninput="detecterZone()">
+                                <small class="text-muted">Entrez votre quartier pour voir les frais de livraison</small>
+                            </div>
+
+                            <!-- Zone détectée automatiquement -->
+                            <div id="zoneDetectee" class="alert alert-success mb-3" style="display: none;">
+                                <i class="bi bi-check-circle me-1"></i>
+                                <span id="zoneNom"></span> - Frais: <strong id="zonePrix"></strong> FCFA
+                            </div>
+
+                            <!-- Zone non trouvée -->
+                            <div id="zoneNonTrouvee" class="alert alert-warning mb-3" style="display: none;">
+                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                Quartier non reconnu. Veuillez sélectionner une zone manuellement.
+                            </div>
+
+                            <!-- Sélection manuelle de zone (si non trouvée) -->
+                            <div class="mb-3" id="zoneManuelleSection" style="display: none;">
+                                <label for="ZoneId" class="form-label fw-bold">
+                                    <i class="bi bi-map me-1"></i>Sélectionner une zone
+                                </label>
+                                <select class="form-select" name="ZoneId" id="ZoneId" onchange="updateFraisManuel()">
+                                    <option value="">-- Choisir une zone --</option>
+                                    @foreach (var zone in Model.Zones)
+                                    {
+                                        <option value="@zone.Id" data-prix="@zone.PrixLivraison">
+                                            @zone.Nom - @zone.PrixLivraison.ToString("N0") FCFA
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+
+                            <!-- Champ caché pour la zone détectée -->
+                            <input type="hidden" name="ZoneIdDetectee" id="ZoneIdDetectee" value="" />
+
+                            <!-- Adresse de livraison -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-house-door me-1"></i>Adresse complète
+                                </label>
+                                
+                                @if (!string.IsNullOrEmpty(Model.AdresseEnregistree))
                                 {
-                                    <option value="@zone.Id" data-prix="@zone.PrixLivraison">
-                                        @zone.Nom - @zone.PrixLivraison.ToString("N0") FCFA
-                                    </option>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="radio" name="UtiliserAdresseEnregistree" 
+                                               id="useExistingAddress" value="true" checked onchange="toggleAddressInput()">
+                                        <label class="form-check-label" for="useExistingAddress">
+                                            Utiliser mon adresse enregistrée
+                                        </label>
+                                    </div>
+                                    
+                                    <div id="existingAddressDisplay" class="alert alert-light border mb-2">
+                                        <i class="bi bi-pin-map me-1"></i>
+                                        <strong>@Model.AdresseEnregistree</strong>
+                                        <input type="hidden" name="AdresseEnregistree" value="@Model.AdresseEnregistree" />
+                                    </div>
+                                    
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="radio" name="UtiliserAdresseEnregistree" 
+                                               id="useNewAddress" value="false" onchange="toggleAddressInput()">
+                                        <label class="form-check-label" for="useNewAddress">
+                                            Utiliser une autre adresse
+                                        </label>
+                                    </div>
                                 }
-                            </select>
+                                else
+                                {
+                                    <input type="hidden" name="UtiliserAdresseEnregistree" value="false" />
+                                }
+                                
+                                <div id="newAddressInput" style="display: @(string.IsNullOrEmpty(Model.AdresseEnregistree) ? "block" : "none");">
+                                    <textarea class="form-control" name="NouvelleAdresse" id="NouvelleAdresse" 
+                                              rows="2" placeholder="Adresse complète avec point de repère..."></textarea>
+                                </div>
+                            </div>
                         </div>
 
                         <hr>
 
                         <button type="submit" class="btn btn-warning btn-lg w-100">
-                            💳 Procéder au paiement
+                            <i class="bi bi-credit-card me-2"></i> Procéder au paiement
                         </button>
                     </form>
                 </div>
@@ -106,40 +182,172 @@
 
             <div class="mt-3">
                 <a asp-action="Panier" class="btn btn-outline-secondary">
-                    ← Retour au panier
+                    <i class="bi bi-arrow-left me-1"></i> Retour au panier
                 </a>
             </div>
         </div>
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        var sousTotal = @Model.Panier.Total;
+<script>
+    var sousTotal = @((int)Model.Panier.Total);
+    var fraisLivraison = 0;
+    var adresseEnregistree = '@(Model.AdresseEnregistree?.Replace("'", "\\'") ?? "")';
+    
+    // Données des zones depuis le serveur
+    var zones = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(zonesData));
 
-        function updateLivraison() {
-            var livraisonSelected = document.getElementById('livraison').checked;
-            var zoneSelection = document.getElementById('zoneSelection');
-            var fraisRow = document.getElementById('fraisLivraisonRow');
+    function updateLivraison() {
+        var livraisonSelected = document.getElementById('livraison').checked;
+        var livraisonSection = document.getElementById('livraisonSection');
+        var fraisRow = document.getElementById('fraisLivraisonRow');
 
-            if (livraisonSelected) {
-                zoneSelection.style.display = 'block';
-                fraisRow.style.display = 'table-row';
-                updateFrais();
-            } else {
-                zoneSelection.style.display = 'none';
-                fraisRow.style.display = 'none';
-                document.getElementById('totalCommande').textContent = sousTotal.toLocaleString() + ' FCFA';
+        if (livraisonSelected) {
+            livraisonSection.style.display = 'block';
+            fraisRow.style.display = 'table-row';
+            // Si adresse enregistrée existe et est sélectionnée, détecter la zone
+            var useExisting = document.getElementById('useExistingAddress');
+            if (useExisting && useExisting.checked && adresseEnregistree) {
+                detecterZoneDepuisAdresse(adresseEnregistree);
             }
+        } else {
+            livraisonSection.style.display = 'none';
+            fraisRow.style.display = 'none';
+            fraisLivraison = 0;
+            updateTotal();
+        }
+    }
+
+    function detecterZoneDepuisAdresse(adresse) {
+        var zoneDetectee = document.getElementById('zoneDetectee');
+        var zoneNonTrouvee = document.getElementById('zoneNonTrouvee');
+        var zoneManuelle = document.getElementById('zoneManuelleSection');
+        var zoneIdDetectee = document.getElementById('ZoneIdDetectee');
+        var zoneSelect = document.getElementById('ZoneId');
+        var quartierInput = document.getElementById('quartierInput');
+
+        var adresseLower = adresse.toLowerCase();
+
+        // Chercher la zone correspondante dans l'adresse
+        var zoneTrouvee = null;
+        for (var i = 0; i < zones.length; i++) {
+            var quartiersZone = zones[i].quartiers.split(',').map(q => q.trim().toLowerCase());
+            for (var j = 0; j < quartiersZone.length; j++) {
+                if (quartiersZone[j] && adresseLower.includes(quartiersZone[j])) {
+                    zoneTrouvee = zones[i];
+                    // Mettre le quartier trouvé dans le champ
+                    quartierInput.value = quartiersZone[j].charAt(0).toUpperCase() + quartiersZone[j].slice(1);
+                    break;
+                }
+            }
+            if (zoneTrouvee) break;
         }
 
-        function updateFrais() {
-            var select = document.getElementById('ZoneId');
-            var option = select.options[select.selectedIndex];
-            var frais = option ? parseFloat(option.getAttribute('data-prix')) || 0 : 0;
-
-            document.getElementById('fraisLivraison').textContent = frais.toLocaleString() + ' FCFA';
-            document.getElementById('totalCommande').textContent = (sousTotal + frais).toLocaleString() + ' FCFA';
+        if (zoneTrouvee) {
+            zoneDetectee.style.display = 'block';
+            zoneNonTrouvee.style.display = 'none';
+            zoneManuelle.style.display = 'none';
+            document.getElementById('zoneNom').textContent = zoneTrouvee.nom;
+            document.getElementById('zonePrix').textContent = zoneTrouvee.prix.toLocaleString();
+            zoneIdDetectee.value = zoneTrouvee.id;
+            zoneSelect.value = '';
+            fraisLivraison = zoneTrouvee.prix;
+        } else {
+            zoneDetectee.style.display = 'none';
+            zoneNonTrouvee.style.display = 'block';
+            zoneManuelle.style.display = 'block';
+            zoneIdDetectee.value = '';
+            fraisLivraison = 0;
         }
-    </script>
-}
+        
+        updateTotal();
+    }
+
+    function detecterZone() {
+        var quartier = document.getElementById('quartierInput').value.toLowerCase().trim();
+        var zoneDetectee = document.getElementById('zoneDetectee');
+        var zoneNonTrouvee = document.getElementById('zoneNonTrouvee');
+        var zoneManuelle = document.getElementById('zoneManuelleSection');
+        var zoneIdDetectee = document.getElementById('ZoneIdDetectee');
+        var zoneSelect = document.getElementById('ZoneId');
+
+        if (quartier.length < 2) {
+            zoneDetectee.style.display = 'none';
+            zoneNonTrouvee.style.display = 'none';
+            zoneManuelle.style.display = 'none';
+            fraisLivraison = 0;
+            updateTotal();
+            return;
+        }
+
+        // Chercher la zone correspondante
+        var zoneTrouvee = null;
+        for (var i = 0; i < zones.length; i++) {
+            var quartiersZone = zones[i].quartiers.split(',').map(q => q.trim().toLowerCase());
+            for (var j = 0; j < quartiersZone.length; j++) {
+                if (quartiersZone[j].includes(quartier) || quartier.includes(quartiersZone[j])) {
+                    zoneTrouvee = zones[i];
+                    break;
+                }
+            }
+            if (zoneTrouvee) break;
+        }
+
+        if (zoneTrouvee) {
+            zoneDetectee.style.display = 'block';
+            zoneNonTrouvee.style.display = 'none';
+            zoneManuelle.style.display = 'none';
+            document.getElementById('zoneNom').textContent = zoneTrouvee.nom;
+            document.getElementById('zonePrix').textContent = zoneTrouvee.prix.toLocaleString();
+            zoneIdDetectee.value = zoneTrouvee.id;
+            zoneSelect.value = ''; // Reset manual selection
+            fraisLivraison = zoneTrouvee.prix;
+        } else {
+            zoneDetectee.style.display = 'none';
+            zoneNonTrouvee.style.display = 'block';
+            zoneManuelle.style.display = 'block';
+            zoneIdDetectee.value = '';
+        }
+        
+        updateTotal();
+    }
+
+    function updateFraisManuel() {
+        var select = document.getElementById('ZoneId');
+        var option = select.options[select.selectedIndex];
+        fraisLivraison = option ? parseFloat(option.getAttribute('data-prix')) || 0 : 0;
+        updateTotal();
+    }
+
+    function updateTotal() {
+        document.getElementById('fraisLivraison').textContent = fraisLivraison.toLocaleString() + ' FCFA';
+        document.getElementById('totalCommande').textContent = (sousTotal + fraisLivraison).toLocaleString() + ' FCFA';
+    }
+
+    function toggleAddressInput() {
+        var useExisting = document.getElementById('useExistingAddress');
+        var newAddressInput = document.getElementById('newAddressInput');
+        var existingDisplay = document.getElementById('existingAddressDisplay');
+        var quartierInput = document.getElementById('quartierInput');
+
+        if (useExisting && useExisting.checked) {
+            newAddressInput.style.display = 'none';
+            if (existingDisplay) existingDisplay.style.display = 'block';
+            // Détecter la zone depuis l'adresse enregistrée
+            if (adresseEnregistree) {
+                detecterZoneDepuisAdresse(adresseEnregistree);
+            }
+        } else {
+            newAddressInput.style.display = 'block';
+            if (existingDisplay) existingDisplay.style.display = 'none';
+            // Réinitialiser la détection de zone
+            quartierInput.value = '';
+            document.getElementById('zoneDetectee').style.display = 'none';
+            document.getElementById('zoneNonTrouvee').style.display = 'none';
+            document.getElementById('zoneManuelleSection').style.display = 'none';
+            document.getElementById('ZoneIdDetectee').value = '';
+            fraisLivraison = 0;
+            updateTotal();
+        }
+    }
+</script>

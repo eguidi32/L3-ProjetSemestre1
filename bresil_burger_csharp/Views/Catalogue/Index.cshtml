@@ -3,8 +3,33 @@
     ViewData["Title"] = "Catalogue";
 }
 
-<div class="container">
-    <h2 class="text-center my-4">🍔 Notre Catalogue</h2>
+<style>
+    .bg-catalogue {
+        background-color: #FFF2C7 !important;
+        min-height: 100vh;
+    }
+    
+    .hover-card {
+        transition: all 0.3s ease;
+    }
+    
+    .hover-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 1rem 3rem rgba(0,0,0,.175)!important;
+    }
+    
+    .hover-card img {
+        transition: all 0.3s ease;
+    }
+    
+    .hover-card:hover img {
+        transform: scale(1.05);
+    }
+</style>
+
+<div class="bg-catalogue py-4">
+    <div class="container">
+        <h2 class="text-center my-4">Notre Catalogue</h2>
     
     <!-- Filtres -->
     <div class="d-flex justify-content-center mb-4">
@@ -15,11 +40,11 @@
             </a>
             <a asp-action="Index" asp-route-filtre="burger" 
                class="btn @(Model.Filtre == "burger" ? "btn-warning" : "btn-outline-warning")">
-                🍔 Burgers
+                <i class="bi bi-circle-fill me-1"></i> Burgers
             </a>
             <a asp-action="Index" asp-route-filtre="menu" 
                class="btn @(Model.Filtre == "menu" ? "btn-warning" : "btn-outline-warning")">
-                🍟 Menus
+                <i class="bi bi-box-seam me-1"></i> Menus
             </a>
         </div>
     </div>
@@ -30,7 +55,7 @@
         <div class="mb-5">
             @if (Model.Filtre == "tous")
             {
-                <h3 class="mb-3">🍔 Nos Burgers</h3>
+                <h3 class="mb-3"><i class="bi bi-circle-fill me-2 text-warning"></i>Nos Burgers</h3>
             }
             
             @if (Model.Burgers.Any())
@@ -39,20 +64,23 @@
                     @foreach (var burger in Model.Burgers)
                     {
                         <div class="col">
-                            <div class="card h-100 shadow-sm">
-                                <img src="@burger.Image" class="card-img-top" alt="@burger.Nom" 
-                                     style="height: 200px; object-fit: cover;"
-                                     onerror="this.src='https://via.placeholder.com/300x200?text=Burger'">
-                                <div class="card-body">
-                                    <h5 class="card-title">@burger.Nom</h5>
-                                    <p class="card-text text-warning fw-bold fs-5">
+                            <div class="card h-100 shadow-sm border-0 hover-card">
+                                <div class="position-relative">
+                                    <img src="@burger.Image" class="card-img-top" alt="@burger.Nom" 
+                                         style="height: 250px; object-fit: cover;"
+                                         onerror="this.src='https://via.placeholder.com/300x250/FFCD29/1a1a1a?text=@burger.Nom'">
+                                    <span class="position-absolute top-0 end-0 m-2 badge bg-warning text-dark fs-6">
                                         @burger.Prix.ToString("N0") FCFA
-                                    </p>
+                                    </span>
                                 </div>
-                                <div class="card-footer bg-transparent">
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title fw-bold mb-2">@burger.Nom</h5>
+                                    <p class="card-text text-muted small flex-grow-1">
+                                        Délicieux burger préparé avec des ingrédients frais
+                                    </p>
                                     <a asp-action="Burger" asp-route-id="@burger.Id" 
-                                       class="btn btn-warning w-100">
-                                        Voir détails
+                                       class="btn btn-warning w-100 mt-2">
+                                        <i class="bi bi-eye me-2"></i>Voir détails
                                     </a>
                                 </div>
                             </div>
@@ -62,7 +90,9 @@
             }
             else
             {
-                <p class="text-muted text-center">Aucun burger disponible pour le moment.</p>
+                <div class="alert alert-info text-center">
+                    Aucun burger disponible pour le moment.
+                </div>
             }
         </div>
     }
@@ -73,7 +103,7 @@
         <div class="mb-5">
             @if (Model.Filtre == "tous")
             {
-                <h3 class="mb-3">🍟 Nos Menus</h3>
+                <h3 class="mb-3"><i class="bi bi-box-seam me-2 text-warning"></i>Nos Menus</h3>
             }
             
             @if (Model.Menus.Any())
@@ -82,25 +112,34 @@
                     @foreach (var menu in Model.Menus)
                     {
                         <div class="col">
-                            <div class="card h-100 shadow-sm">
-                                <img src="@menu.Image" class="card-img-top" alt="@menu.Nom"
-                                     style="height: 200px; object-fit: cover;"
-                                     onerror="this.src='https://via.placeholder.com/300x200?text=Menu'">
-                                <div class="card-body">
-                                    <h5 class="card-title">@menu.Nom</h5>
-                                    <p class="card-text small text-muted">
-                                        <i class="bi bi-check-circle"></i> @menu.Burger?.Nom<br>
-                                        <i class="bi bi-check-circle"></i> @menu.Boisson?.Nom<br>
-                                        <i class="bi bi-check-circle"></i> @menu.Frite?.Nom
-                                    </p>
-                                    <p class="card-text text-warning fw-bold fs-5">
+                            <div class="card h-100 shadow-sm border-0 hover-card">
+                                <div class="position-relative">
+                                    <img src="@menu.Image" class="card-img-top" alt="@menu.Nom"
+                                         style="height: 250px; object-fit: cover;"
+                                         onerror="this.src='https://via.placeholder.com/300x250/FFCD29/1a1a1a?text=@menu.Nom'">
+                                    <span class="position-absolute top-0 start-0 m-2 badge bg-success">
+                                        <i class="bi bi-box-seam me-1"></i>Menu
+                                    </span>
+                                    <span class="position-absolute top-0 end-0 m-2 badge bg-warning text-dark fs-6">
                                         @menu.Prix.ToString("N0") FCFA
-                                    </p>
+                                    </span>
                                 </div>
-                                <div class="card-footer bg-transparent">
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title fw-bold mb-3">@menu.Nom</h5>
+                                    <div class="flex-grow-1">
+                                        <p class="small mb-2 text-success">
+                                            <i class="bi bi-check-circle-fill me-2"></i>@menu.Burger?.Nom
+                                        </p>
+                                        <p class="small mb-2 text-success">
+                                            <i class="bi bi-check-circle-fill me-2"></i>@menu.Boisson?.Nom
+                                        </p>
+                                        <p class="small mb-2 text-success">
+                                            <i class="bi bi-check-circle-fill me-2"></i>@menu.Frite?.Nom
+                                        </p>
+                                    </div>
                                     <a asp-action="Menu" asp-route-id="@menu.Id" 
-                                       class="btn btn-warning w-100">
-                                        Voir détails
+                                       class="btn btn-warning w-100 mt-2">
+                                        <i class="bi bi-cart-plus me-2"></i>Commander
                                     </a>
                                 </div>
                             </div>
@@ -110,8 +149,11 @@
             }
             else
             {
-                <p class="text-muted text-center">Aucun menu disponible pour le moment.</p>
+                <div class="alert alert-info text-center">
+                    Aucun menu disponible pour le moment.
+                </div>
             }
         </div>
     }
+    </div>
 </div>

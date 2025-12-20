@@ -28,7 +28,7 @@ namespace bresil_burger_csharp.Data
             modelBuilder.Entity<Burger>().ToTable("burger");
             modelBuilder.Entity<Complement>().ToTable("complement");
             modelBuilder.Entity<Menu>().ToTable("menu");
-            modelBuilder.Entity<Client>().ToTable("client");
+            modelBuilder.Entity<Client>().ToTable("utilisateur");
             modelBuilder.Entity<Zone>().ToTable("zone");
             modelBuilder.Entity<Commande>().ToTable("commande");
             modelBuilder.Entity<LigneCommande>().ToTable("ligne_commande");
@@ -62,6 +62,13 @@ namespace bresil_burger_csharp.Data
                 .HasOne(c => c.Zone)
                 .WithMany()
                 .HasForeignKey(c => c.ZoneId);
+
+            // Configuration explicite du MontantTotal
+            modelBuilder.Entity<Commande>()
+                .Property(c => c.MontantTotal)
+                .HasColumnName("montant_total")
+                .HasColumnType("decimal(10,2)")
+                .IsRequired();
 
             // Relation LigneCommande -> Commande
             modelBuilder.Entity<LigneCommande>()

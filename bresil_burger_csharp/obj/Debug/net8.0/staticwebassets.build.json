@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "3nJlbSZtpNeLTSFdsM5VwUNVN4tz2V66rqeC8CHPdNc=",
+  "Hash": "ZwQ0skhYZgH5qe3Zw6cJnOk7vSi0SEOGon/eUvLUSw0=",
   "Source": "bresil_burger_csharp",
   "BasePath": "_content/bresil_burger_csharp",
   "Mode": "Default",
@@ -91,6 +91,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\favicon.ico"
+    },
+    {
+      "Identity": "D:\\L3SemestreOne\\bresil_burger_csharp\\bresil_burger_csharp\\wwwroot\\images\\logo.png",
+      "SourceId": "bresil_burger_csharp",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\L3SemestreOne\\bresil_burger_csharp\\bresil_burger_csharp\\wwwroot\\",
+      "BasePath": "_content/bresil_burger_csharp",
+      "RelativePath": "images/logo.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\logo.png"
     },
     {
       "Identity": "D:\\L3SemestreOne\\bresil_burger_csharp\\bresil_burger_csharp\\wwwroot\\js\\site.js",

@@ -103,7 +103,7 @@ namespace bresil_burger_csharp.Controllers
                 Email = model.Email,
                 Adresse = model.Adresse,
                 MotDePasse = BCrypt.Net.BCrypt.HashPassword(model.MotDePasse),
-                DateInscription = DateTime.Now
+                DateInscription = DateTime.UtcNow
             };
 
             _context.Clients.Add(client);
@@ -123,6 +123,100 @@ namespace bresil_burger_csharp.Controllers
         {
             HttpContext.Session.Clear();
             return RedirectToAction("Index", "Home");
+        }
+
+        // GET: /Auth/Profil
+        public async Task<IActionResult> Profil()
+        {
+            var clientId = HttpContext.Session.GetInt32("ClientId");
+            if (clientId == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            var client = await _context.Clients.FindAsync(clientId);
+            if (client == null)
+            {
+                return NotFound();
+            }
+
+            return View(client);
+        }
+
+        // POST: /Auth/Profil
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Profil(Client model)
+        {
+            var clientId = HttpContext.Session.GetInt32("ClientId");
+            if (clientId == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            var client = await _context.Clients.FindAsync(clientId);
+            if (client == null)
+            {
+                return NotFound();
+            }
+
+            // Mettre à jour les informations
+            client.Nom = model.Nom;
+            client.Prenom = model.Prenom;
+            client.Telephone = model.Telephone;
+
+            await _context.SaveChangesAsync();
+
+            // Mettre à jour la session
+            HttpContext.Session.SetString("ClientNom", client.Nom);
+            HttpContext.Session.SetString("ClientPrenom", client.Prenom);
+
+            TempData["Success"] = "Votre profil a été mis à jour avec succès.";
+            return RedirectToAction("Profil");
+        }
+
+        // GET: /Auth/Adresse
+        public async Task<IActionResult> Adresse()
+        {
+            var clientId = HttpContext.Session.GetInt32("ClientId");
+            if (clientId == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            var client = await _context.Clients.FindAsync(clientId);
+            if (client == null)
+            {
+                return NotFound();
+            }
+
+            return View(client);
+        }
+
+        // POST: /Auth/Adresse
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Adresse(Client model)
+        {
+            var clientId = HttpContext.Session.GetInt32("ClientId");
+            if (clientId == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            var client = await _context.Clients.FindAsync(clientId);
+            if (client == null)
+            {
+                return NotFound();
+            }
+
+            // Mettre à jour l'adresse
+            client.Adresse = model.Adresse;
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Votre adresse a été mise à jour avec succès.";
+            return RedirectToAction("Adresse");
         }
     }
 }
