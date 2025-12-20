@@ -218,5 +218,51 @@ namespace bresil_burger_csharp.Controllers
             TempData["Success"] = "Votre adresse a été mise à jour avec succès.";
             return RedirectToAction("Adresse");
         }
+
+        // POST: /Auth/ModifierMotDePasse
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ModifierMotDePasse(string MotDePasseActuel, string NouveauMotDePasse, string ConfirmerMotDePasse)
+        {
+            var clientId = HttpContext.Session.GetInt32("ClientId");
+            if (clientId == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            var client = await _context.Clients.FindAsync(clientId);
+            if (client == null)
+            {
+                return NotFound();
+            }
+
+            // Vérifier le mot de passe actuel
+            if (!BCrypt.Net.BCrypt.Verify(MotDePasseActuel, client.MotDePasse))
+            {
+                TempData["PasswordError"] = "Le mot de passe actuel est incorrect.";
+                return RedirectToAction("Profil");
+            }
+
+            // Vérifier que les nouveaux mots de passe correspondent
+            if (NouveauMotDePasse != ConfirmerMotDePasse)
+            {
+                TempData["PasswordError"] = "Les nouveaux mots de passe ne correspondent pas.";
+                return RedirectToAction("Profil");
+            }
+
+            // Vérifier la longueur minimale
+            if (NouveauMotDePasse.Length < 6)
+            {
+                TempData["PasswordError"] = "Le nouveau mot de passe doit contenir au moins 6 caractères.";
+                return RedirectToAction("Profil");
+            }
+
+            // Mettre à jour le mot de passe
+            client.MotDePasse = BCrypt.Net.BCrypt.HashPassword(NouveauMotDePasse);
+            await _context.SaveChangesAsync();
+
+            TempData["PasswordSuccess"] = "Votre mot de passe a été modifié avec succès.";
+            return RedirectToAction("Profil");
+        }
     }
 }

@@ -6,15 +6,24 @@
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-            <div class="card shadow">
+            <!-- Section Profil -->
+            <div class="card shadow mb-4">
                 <div class="card-header bg-warning text-dark">
                     <h4 class="mb-0"><i class="bi bi-person-circle me-2"></i>Mon Profil</h4>
                 </div>
                 <div class="card-body">
                     @if (TempData["Success"] != null)
                     {
-                        <div class="alert alert-success">
+                        <div class="alert alert-success alert-dismissible fade show">
                             <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            <i class="bi bi-exclamation-circle me-2"></i>@TempData["Error"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     }
 
@@ -57,16 +66,66 @@
                             <input value="@Model.DateInscription.ToString("dd/MM/yyyy")" class="form-control" readonly disabled />
                         </div>
 
-                        <div class="d-grid gap-2">
+                        <div class="d-grid">
                             <button type="submit" class="btn btn-warning">
                                 <i class="bi bi-check-circle me-2"></i>Enregistrer les modifications
                             </button>
-                            <a asp-controller="Catalogue" asp-action="Index" class="btn btn-outline-secondary">
-                                <i class="bi bi-arrow-left me-2"></i>Retour au catalogue
-                            </a>
                         </div>
                     </form>
                 </div>
+            </div>
+
+            <!-- Section Modifier le mot de passe -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="bi bi-shield-lock me-2"></i>Modifier le mot de passe</h5>
+                </div>
+                <div class="card-body">
+                    @if (TempData["PasswordSuccess"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show">
+                            <i class="bi bi-check-circle me-2"></i>@TempData["PasswordSuccess"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+                    @if (TempData["PasswordError"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            <i class="bi bi-exclamation-circle me-2"></i>@TempData["PasswordError"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-action="ModifierMotDePasse" method="post">
+                        <div class="mb-3">
+                            <label class="form-label"><i class="bi bi-lock me-2"></i>Mot de passe actuel</label>
+                            <input type="password" name="MotDePasseActuel" class="form-control" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label"><i class="bi bi-lock-fill me-2"></i>Nouveau mot de passe</label>
+                            <input type="password" name="NouveauMotDePasse" class="form-control" required minlength="6" />
+                            <small class="text-muted">Minimum 6 caractères</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label"><i class="bi bi-lock-fill me-2"></i>Confirmer le nouveau mot de passe</label>
+                            <input type="password" name="ConfirmerMotDePasse" class="form-control" required minlength="6" />
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-dark">
+                                <i class="bi bi-key me-2"></i>Modifier le mot de passe
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <a asp-controller="Catalogue" asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Retour au catalogue
+                </a>
             </div>
         </div>
     </div>
