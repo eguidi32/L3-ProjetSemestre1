@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: bresil-burger-symfony
+    runtime: docker
+    repo: https://github.com/eguidi32/L3-ProjetSemestre1.git
+    branch: bresil_burger_symfony
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: APP_ENV
+        value: prod
+      - key: APP_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        value: postgresql://neondb_owner:npg_E8a4biRlywkZ@ep-red-sunset-ab755vzr-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require&charset=utf8
+      - key: CLOUDINARY_CLOUD_NAME
+        value: dpl0fmyvw
+      - key: CLOUDINARY_API_KEY
+        value: "267169677382543"
+      - key: CLOUDINARY_API_SECRET
+        value: d78wqqjX0B2_mHwHhdOTzoKSrXw
+    plan: free

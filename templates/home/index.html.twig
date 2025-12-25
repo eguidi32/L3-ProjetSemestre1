@@ -1,0 +1,117 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Brasil Burger - Gestionnaire{% endblock %}
+
+{% block stylesheets %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #fff;
+    }
+    .container {
+        text-align: center;
+        padding: 40px;
+    }
+    .logo {
+        font-size: 4rem;
+        margin-bottom: 20px;
+    }
+    h1 {
+        font-size: 3rem;
+        margin-bottom: 10px;
+        background: linear-gradient(90deg, #f39c12, #e74c3c);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .subtitle {
+        font-size: 1.5rem;
+        color: #bdc3c7;
+        margin-bottom: 30px;
+    }
+    .status {
+        display: inline-block;
+        padding: 10px 30px;
+        background: linear-gradient(90deg, #27ae60, #2ecc71);
+        border-radius: 50px;
+        font-weight: bold;
+        margin-bottom: 40px;
+    }
+    .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .feature {
+        background: rgba(255,255,255,0.1);
+        padding: 25px;
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+    }
+    .feature-icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+    }
+    .feature h3 {
+        margin-bottom: 10px;
+        color: #f39c12;
+    }
+    .feature p {
+        color: #bdc3c7;
+        font-size: 0.9rem;
+    }
+    .footer {
+        margin-top: 50px;
+        color: #7f8c8d;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="logo">🍔</div>
+    <h1>Brasil Burger</h1>
+    <p class="subtitle">Système de Gestion - Symfony</p>
+    
+    <div class="status">✅ Déploiement réussi</div>
+    
+    <div class="features">
+        <div class="feature">
+            <div class="feature-icon">📦</div>
+            <h3>Catalogue</h3>
+            <p>Gérer burgers, menus et compléments</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">📋</div>
+            <h3>Commandes</h3>
+            <p>Suivi et gestion des commandes</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">🚚</div>
+            <h3>Livraisons</h3>
+            <p>Organisation par zone</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">📊</div>
+            <h3>Statistiques</h3>
+            <p>Tableau de bord temps réel</p>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>Projet L3 - Semestre 1 | {{ "now"|date("Y") }}</p>
+    </div>
+</div>
+{% endblock %}
