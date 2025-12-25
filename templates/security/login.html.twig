@@ -1,0 +1,141 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion - Brasil Burger{% endblock %}
+
+{% block stylesheets %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .login-container {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        width: 100%;
+        max-width: 420px;
+    }
+    .login-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .login-header .logo {
+        font-size: 4rem;
+        margin-bottom: 10px;
+    }
+    .login-header h1 {
+        color: #1a1a2e;
+        font-size: 1.8rem;
+        margin-bottom: 5px;
+    }
+    .login-header p {
+        color: #666;
+        font-size: 0.95rem;
+    }
+    .alert {
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 0.9rem;
+    }
+    .alert-danger {
+        background: #fee2e2;
+        color: #dc2626;
+        border: 1px solid #fecaca;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 500;
+    }
+    .form-group input {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .form-group input:focus {
+        outline: none;
+        border-color: #f39c12;
+        box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.1);
+    }
+    .btn-login {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(90deg, #f39c12, #e74c3c);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(243, 156, 18, 0.4);
+    }
+    .login-footer {
+        text-align: center;
+        margin-top: 25px;
+        color: #666;
+        font-size: 0.85rem;
+    }
+    .login-footer a {
+        color: #f39c12;
+        text-decoration: none;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="login-container">
+    <div class="login-header">
+        <div class="logo"> </div>
+        <h1>Brasil Burger</h1>
+        <p>Espace Gestionnaire</p>
+    </div>
+
+    {% if error %}
+        <div class="alert alert-danger">
+            {{ error.messageKey|trans(error.messageData, 'security') }}
+        </div>
+    {% endif %}
+
+    <form method="post">
+        <div class="form-group">
+            <label for="username">Email</label>
+            <input type="email" id="username" name="_username" value="{{ last_username }}" required autofocus placeholder="votre@email.com">
+        </div>
+
+        <div class="form-group">
+            <label for="password">Mot de passe</label>
+            <input type="password" id="password" name="_password" required placeholder="••••••••">
+        </div>
+
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+        <button type="submit" class="btn-login">Se connecter</button>
+    </form>
+
+    <div class="login-footer">
+        <p>© {{ "now"|date("Y") }} Brasil Burger - Tous droits réservés</p>
+    </div>
+</div>
+{% endblock %}
