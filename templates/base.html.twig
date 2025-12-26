@@ -187,10 +187,11 @@
     {% block stylesheets %}{% endblock %}
 </head>
 <body>
+    {% if app.user %}
     <!-- Sidebar -->
     <nav class="sidebar">
         <div class="sidebar-header">
-            <div class="logo"> </div>
+            <div class="logo">🍔</div>
             <h2>Brasil Burger</h2>
             <p>Espace Gestionnaire</p>
         </div>
@@ -221,11 +222,13 @@
         </ul>
         
     </nav>
+    {% endif %}
 
     <!-- Main Content -->
-    <main class="main-content">
+    <main class="main-content {% if not app.user %}ms-0{% endif %}">
         <div class="top-bar">
             <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+            {% if app.user %}
             <div class="user-info">
                 <div class="avatar">
                     {{ app.user.prenom|first|upper }}{{ app.user.nom|first|upper }}
@@ -238,6 +241,7 @@
                     <i class="bi bi-box-arrow-right"></i> Déconnexion
                 </a>
             </div>
+            {% endif %}
         </div>
 
         {% for label, messages in app.flashes %}
