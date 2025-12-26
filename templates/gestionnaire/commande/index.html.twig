@@ -15,7 +15,7 @@
             <div class="row g-3">
                 <div class="col-md-2">
                     <label class="form-label">Etat</label>
-                    <select name="etat" class="form-select">
+                    <select name="etat" class="form-select form-select-sm">
                         <option value="">Tous</option>
                         <option value="EN_ATTENTE" {{ filtres.etat == 'EN_ATTENTE' ? 'selected' : '' }}>En attente</option>
                         <option value="EN_PREPARATION" {{ filtres.etat == 'EN_PREPARATION' ? 'selected' : '' }}>En preparation</option>
@@ -25,8 +25,8 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label">Type de service</label>
-                    <select name="type_service" class="form-select">
+                    <label class="form-label">Type service</label>
+                    <select name="type_service" class="form-select form-select-sm">
                         <option value="">Tous</option>
                         <option value="SUR_PLACE" {{ filtres.type_service == 'SUR_PLACE' ? 'selected' : '' }}>Sur place</option>
                         <option value="A_EMPORTER" {{ filtres.type_service == 'A_EMPORTER' ? 'selected' : '' }}>A emporter</option>
@@ -34,16 +34,30 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label">Date debut</label>
-                    <input type="date" name="date_debut" class="form-control" value="{{ filtres.date_debut }}">
+                    <label class="form-label">Burger</label>
+                    <select name="burger" class="form-select form-select-sm">
+                        <option value="">Tous</option>
+                        {% for burger in burgers %}
+                        <option value="{{ burger.id }}" {{ filtres.burger == burger.id ? 'selected' : '' }}>
+                            {{ burger.nom }}
+                        </option>
+                        {% endfor %}
+                    </select>
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label">Date fin</label>
-                    <input type="date" name="date_fin" class="form-control" value="{{ filtres.date_fin }}">
+                    <label class="form-label">Menu</label>
+                    <select name="menu" class="form-select form-select-sm">
+                        <option value="">Tous</option>
+                        {% for menu in menus %}
+                        <option value="{{ menu.id }}" {{ filtres.menu == menu.id ? 'selected' : '' }}>
+                            {{ menu.nom }}
+                        </option>
+                        {% endfor %}
+                    </select>
                 </div>
                 <div class="col-md-2">
                     <label class="form-label">Client</label>
-                    <select name="client" class="form-select">
+                    <select name="client" class="form-select form-select-sm">
                         <option value="">Tous</option>
                         {% for client in clients %}
                         <option value="{{ client.id }}" {{ filtres.client == client.id ? 'selected' : '' }}>
@@ -52,12 +66,22 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-md-2 d-flex align-items-end gap-2">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-search"></i> Filtrer
+                <div class="col-md-2">
+                    <label class="form-label">Date debut</label>
+                    <input type="date" name="date_debut" class="form-control form-control-sm" value="{{ filtres.date_debut }}">
+                </div>
+            </div>
+            <div class="row g-3 mt-1">
+                <div class="col-md-2">
+                    <label class="form-label">Date fin</label>
+                    <input type="date" name="date_fin" class="form-control form-control-sm" value="{{ filtres.date_fin }}">
+                </div>
+                <div class="col-md-4 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <i class="bi bi-search me-1"></i> Filtrer
                     </button>
-                    <a href="{{ path('app_gestionnaire_commandes') }}" class="btn btn-secondary">
-                        <i class="bi bi-x-lg"></i>
+                    <a href="{{ path('app_gestionnaire_commandes') }}" class="btn btn-secondary btn-sm">
+                        <i class="bi bi-x-lg me-1"></i> Reset
                     </a>
                 </div>
             </div>

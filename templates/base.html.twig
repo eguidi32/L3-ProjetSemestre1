@@ -194,28 +194,10 @@
             <h2>Brasil Burger</h2>
             <p>Espace Gestionnaire</p>
         </div>
-
         <ul class="nav-menu">
             <li>
                 <a href="{{ path('app_gestionnaire_dashboard') }}" class="{{ app.request.attributes.get('_route') == 'app_gestionnaire_dashboard' ? 'active' : '' }}">
                     <i class="bi bi-speedometer2"></i> Dashboard
-                </a>
-            </li>
-
-            <div class="nav-section">Catalogue</div>
-            <li>
-                <a href="{{ path('app_gestionnaire_burgers') }}" class="{{ 'burger' in app.request.attributes.get('_route') ? 'active' : '' }}">
-                    <i class="bi bi-circle-fill"></i> Burgers
-                </a>
-            </li>
-            <li>
-                <a href="{{ path('app_gestionnaire_menus') }}" class="{{ 'menu' in app.request.attributes.get('_route') ? 'active' : '' }}">
-                    <i class="bi bi-box-seam"></i> Menus
-                </a>
-            </li>
-            <li>
-                <a href="{{ path('app_gestionnaire_complements') }}" class="{{ 'complement' in app.request.attributes.get('_route') ? 'active' : '' }}">
-                    <i class="bi bi-plus-circle"></i> Compléments
                 </a>
             </li>
 
@@ -230,7 +212,6 @@
                     <i class="bi bi-truck"></i> Livraisons
                 </a>
             </li>
-
             <div class="nav-section">Rapports</div>
             <li>
                 <a href="{{ path('app_gestionnaire_statistiques') }}" class="{{ 'statistique' in app.request.attributes.get('_route') ? 'active' : '' }}">
@@ -238,6 +219,7 @@
                 </a>
             </li>
         </ul>
+        
     </nav>
 
     <!-- Main Content -->
