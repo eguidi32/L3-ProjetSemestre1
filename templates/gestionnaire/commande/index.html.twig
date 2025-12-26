@@ -76,6 +76,11 @@
                     <label class="form-label">Date fin</label>
                     <input type="date" name="date_fin" class="form-control form-control-sm" value="{{ filtres.date_fin }}">
                 </div>
+                <div class="col-md-4">
+                    <label class="form-label">Recherche (numéro, nom, téléphone)</label>
+                    <input type="text" name="recherche" class="form-control form-control-sm" 
+                           placeholder="Rechercher..." value="{{ filtres.recherche }}">
+                </div>
                 <div class="col-md-4 d-flex align-items-end gap-2">
                     <button type="submit" class="btn btn-primary btn-sm">
                         <i class="bi bi-search me-1"></i> Filtrer
