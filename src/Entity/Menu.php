@@ -42,6 +42,9 @@ class Menu
     #[ORM\JoinColumn(name: 'id_frites', referencedColumnName: 'id_complement', nullable: false)]
     private ?Complement $frites = null;
 
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, options: ['default' => 0])]
+    private ?string $prix = '0';
+
     public function getId(): ?int
     {
         return $this->id;
@@ -135,8 +138,19 @@ class Menu
         return $this;
     }
 
-    // Prix calculé = burger + boisson + frites
-    public function getPrix(): string
+    public function getPrix(): ?string
+    {
+        return $this->prix;
+    }
+
+    public function setPrix(string $prix): static
+    {
+        $this->prix = $prix;
+        return $this;
+    }
+
+    // Prix calculé = burger + boisson + frites (fallback si prix non défini)
+    public function getPrixCalcule(): string
     {
         $prix = 0;
         if ($this->burger) {
