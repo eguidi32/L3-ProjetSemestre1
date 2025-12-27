@@ -1,0 +1,430 @@
+{% extends 'gestionnaire/base.html.twig' %}
+
+{% block title %}Statistiques - Brasil Burger{% endblock %}
+
+{% block page_title %}Statistiques{% endblock %}
+{% block page_subtitle %}Analysez vos performances et ventes{% endblock %}
+{% block page_icon %}<i class="bi bi-bar-chart-line-fill"></i>{% endblock %}
+
+{% block body %}
+<!-- Sélecteur de date -->
+<div class="card mb-4 fade-in-up">
+    <div class="card-body">
+        <form method="get" class="row align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">
+                    <i class="bi bi-calendar3 me-1"></i>Date d'analyse
+                </label>
+                <input type="date" name="date" class="form-control" value="{{ date|date('Y-m-d') }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search me-2"></i>Analyser
+                </button>
+            </div>
+            <div class="col-md-7 text-end">
+                <a href="{{ path('app_gestionnaire_statistiques', {date: 'now'|date('Y-m-d')}) }}" class="btn btn-outline-primary">
+                    <i class="bi bi-calendar-check me-1"></i>Aujourd'hui
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Statistiques principales -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card stat-info fade-in-up" style="animation-delay: 0.1s;">
+            <div class="icon">
+                <i class="bi bi-hourglass-split"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ stats.commandesEnCours }}</h3>
+                <p>Commandes en cours</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card stat-success fade-in-up" style="animation-delay: 0.2s;">
+            <div class="icon">
+                <i class="bi bi-check-circle-fill"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ stats.commandesValidees }}</h3>
+                <p>Commandes validées</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card stat-warning fade-in-up" style="animation-delay: 0.3s;">
+            <div class="icon">
+                <i class="bi bi-currency-exchange"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ stats.recette|number_format(0, ',', ' ') }} <small>F</small></h3>
+                <p>Recette journalière</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card stat-danger fade-in-up" style="animation-delay: 0.4s;">
+            <div class="icon">
+                <i class="bi bi-x-octagon-fill"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ stats.commandesAnnulees }}</h3>
+                <p>Commandes annulées</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistiques secondaires -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="stat-card stat-purple fade-in-up" style="animation-delay: 0.5s;">
+            <div class="icon">
+                <i class="bi bi-receipt"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ stats.totalCommandes }}</h3>
+                <p>Total commandes du jour</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="stat-card stat-info fade-in-up" style="animation-delay: 0.6s;">
+            <div class="icon">
+                <i class="bi bi-cart-check"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ stats.panierMoyen|number_format(0, ',', ' ') }} <small>F</small></h3>
+                <p>Panier moyen</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Répartition par type de service -->
+    <div class="col-lg-4">
+        <div class="card h-100 fade-in-up" style="animation-delay: 0.7s;">
+            <div class="card-header">
+                <i class="bi bi-pie-chart-fill"></i>
+                <span>Répartition par type</span>
+            </div>
+            <div class="card-body">
+                <div style="position: relative; height: 250px;">
+                    <canvas id="chartRepartition"></canvas>
+                </div>
+                <div class="mt-3">
+                    {% for key, data in commandesParType %}
+                    <div class="d-flex justify-content-between small mb-2">
+                        <span class="d-flex align-items-center gap-2">
+                            <span class="badge {% if key == 'SUR_PLACE' %}bg-primary{% elseif key == 'A_EMPORTER' %}bg-warning{% else %}bg-success{% endif %}">{{ data.total }}</span>
+                            <span>{{ data.label }}</span>
+                        </span>
+                        <span class="fw-semibold">{{ data.montant|number_format(0, ',', ' ') }} F</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Burgers les plus vendus -->
+    <div class="col-lg-4">
+        <div class="card h-100 fade-in-up" style="animation-delay: 0.8s;">
+            <div class="card-header">
+                <i class="bi bi-trophy-fill" style="color: gold;"></i>
+                <span>Burgers les plus vendus</span>
+            </div>
+            <div class="card-body p-0">
+                {% if produitsVendus.burgers|length > 0 %}
+                <ul class="list-group list-group-flush">
+                    {% for burger in produitsVendus.burgers %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                            {% if burger.image %}
+                            <img src="{{ burger.image }}" alt="" class="product-thumb">
+                            {% else %}
+                            <div class="product-thumb-placeholder"></div>
+                            {% endif %}
+                            <span class="fw-medium">{{ burger.nom }}</span>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-primary">{{ burger.quantite }} vendus</span><br>
+                            <small class="text-success fw-semibold">{{ burger.chiffre|number_format(0, ',', ' ') }} F</small>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="empty-state py-4">
+                    <i class="bi bi-emoji-neutral" style="font-size: 2rem;"></i>
+                    <p class="mb-0 mt-2">Aucune vente de burger</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Menus les plus vendus -->
+    <div class="col-lg-4">
+        <div class="card h-100 fade-in-up" style="animation-delay: 0.9s;">
+            <div class="card-header">
+                <i class="bi bi-award-fill" style="color: #8b5cf6;"></i>
+                <span>Menus les plus vendus</span>
+            </div>
+            <div class="card-body p-0">
+                {% if produitsVendus.menus|length > 0 %}
+                <ul class="list-group list-group-flush">
+                    {% for menu in produitsVendus.menus %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                            {% if menu.image %}
+                            <img src="{{ menu.image }}" alt="" class="product-thumb">
+                            {% else %}
+                            <div class="product-thumb-placeholder">🍽️</div>
+                            {% endif %}
+                            <span class="fw-medium">{{ menu.nom }}</span>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-info">{{ menu.quantite }} vendus</span><br>
+                            <small class="text-success fw-semibold">{{ menu.chiffre|number_format(0, ',', ' ') }} F</small>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="empty-state py-4">
+                    <i class="bi bi-emoji-neutral" style="font-size: 2rem;"></i>
+                    <p class="mb-0 mt-2">Aucune vente de menu</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Evolution sur 7 jours -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h6 class="mb-0"><i class="bi bi-graph-up me-2"></i>Evolution sur les 7 derniers jours</h6>
+    </div>
+    <div class="card-body">
+        <!-- Graphique Chart.js -->
+        <div style="position: relative; height: 300px;">
+            <canvas id="chartEvolution"></canvas>
+        </div>
+        
+        <!-- Tableau récapitulatif -->
+        <div class="table-responsive mt-4">
+            <table class="table table-sm table-bordered text-center">
+                <thead class="table-light">
+                    <tr>
+                        {% for jour in evolution %}
+                        <th><small>{{ jour.date }}<br>{{ jour.jour }}</small></th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        {% for jour in evolution %}
+                        <td>
+                            <strong>{{ jour.commandes }}</strong> cmd<br>
+                            <small class="text-success">{{ jour.recette|number_format(0, ',', ' ') }} F</small>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Graphique Camembert - Répartition par type
+    const ctxRepartition = document.getElementById('chartRepartition');
+    if (ctxRepartition) {
+        new Chart(ctxRepartition, {
+            type: 'doughnut',
+            data: {
+                labels: ['Sur place', 'À emporter', 'Livraison'],
+                datasets: [{
+                    data: [
+                        {{ commandesParType.SUR_PLACE.total }},
+                        {{ commandesParType.A_EMPORTER.total }},
+                        {{ commandesParType.LIVRAISON.total }}
+                    ],
+                    backgroundColor: [
+                        '#0d6efd',
+                        '#ffc107',
+                        '#198754'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                return label + ': ' + value + ' (' + percentage + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Graphique Barres/Ligne - Evolution 7 jours
+    const ctxEvolution = document.getElementById('chartEvolution');
+    if (ctxEvolution) {
+        new Chart(ctxEvolution, {
+            type: 'bar',
+            data: {
+                labels: [{% for jour in evolution %}'{{ jour.date }} {{ jour.jour }}'{{ loop.last ? '' : ',' }}{% endfor %}],
+                datasets: [
+                    {
+                        label: 'Recettes (F)',
+                        data: [{% for jour in evolution %}{{ jour.recette }}{{ loop.last ? '' : ',' }}{% endfor %}],
+                        backgroundColor: 'rgba(230, 57, 70, 0.7)',
+                        borderColor: '#e63946',
+                        borderWidth: 2,
+                        borderRadius: 5,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Commandes',
+                        data: [{% for jour in evolution %}{{ jour.commandes }}{{ loop.last ? '' : ',' }}{% endfor %}],
+                        type: 'line',
+                        borderColor: '#1d3557',
+                        backgroundColor: '#1d3557',
+                        tension: 0.3,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.datasetIndex === 0) {
+                                    label += new Intl.NumberFormat('fr-FR').format(context.raw) + ' F';
+                                } else {
+                                    label += context.raw;
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Recettes (F)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return new Intl.NumberFormat('fr-FR').format(value);
+                            }
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Commandes'
+                        },
+                        grid: {
+                            drawOnChartArea: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .stat-card h3 small {
+        font-size: 0.6em;
+        font-weight: 500;
+    }
+    
+    .product-thumb {
+        width: 45px;
+        height: 45px;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 2px solid #f1f5f9;
+    }
+    
+    .product-thumb-placeholder {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+    }
+    
+    .list-group-item {
+        padding: 15px 20px;
+        border-left: none;
+        border-right: none;
+    }
+    
+    .list-group-item:first-child {
+        border-top: none;
+    }
+</style>
+{% endblock %}

@@ -11,9 +11,13 @@ class HomeController extends AbstractController
     #[Route('/', name: 'app_home')]
     public function index(): Response
     {
-        return $this->render('home/index.html.twig', [
-            'title' => 'Brasil Burger - Gestionnaire',
-        ]);
+        // Si l'utilisateur est connecté et a le rôle gestionnaire, rediriger vers le dashboard
+        if ($this->isGranted('ROLE_GESTIONNAIRE')) {
+            return $this->redirectToRoute('app_gestionnaire_dashboard');
+        }
+        
+        // Sinon, rediriger vers la page de connexion
+        return $this->redirectToRoute('app_login');
     }
 
     #[Route('/health', name: 'app_health')]

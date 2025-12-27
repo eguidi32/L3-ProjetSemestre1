@@ -1,0 +1,154 @@
+{% extends 'gestionnaire/base.html.twig' %}
+
+{% block title %}Zones de Livraison - Brasil Burger{% endblock %}
+
+{% block page_title %}Zones de Livraison{% endblock %}
+{% block page_subtitle %}Tarifs de livraison par zone{% endblock %}
+{% block page_icon %}<i class="bi bi-map"></i>{% endblock %}
+
+{% block body %}
+<!-- Liste des zones -->
+<div class="card fade-in-up">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-geo-alt-fill"></i>
+            <span class="fw-semibold">Tarifs par zone</span>
+            <span class="badge bg-primary">{{ totalZones }} zones</span>
+        </div>
+        <a href="{{ path('app_gestionnaire_livraisons') }}" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-arrow-left me-1"></i> Retour
+        </a>
+    </div>
+    <div class="card-body">
+        {% if zonesStats|length > 0 %}
+        <div class="zones-grid">
+            {% for item in zonesStats %}
+            <div class="zone-item fade-in-up" style="animation-delay: {{ loop.index * 0.05 }}s;">
+                <div class="zone-header">
+                    <div class="zone-icon">
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                    <div class="zone-info">
+                        <h5 class="zone-name">{{ item.zone.nom }}</h5>
+                        <div class="zone-price">
+                            <i class="bi bi-truck me-1"></i>
+                            {{ item.zone.prixLivraison|number_format(0, ',', ' ') }} FCFA
+                        </div>
+                    </div>
+                </div>
+                <div class="zone-quartiers">
+                    <div class="quartiers-label">
+                        <i class="bi bi-buildings me-1"></i> Quartiers desservis :
+                    </div>
+                    <div class="quartiers-list">
+                        {{ item.zone.quartiers }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-map"></i>
+            <h4>Aucune zone de livraison</h4>
+            <p>Les zones de livraison n'ont pas encore été configurées</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .zones-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 20px;
+    }
+    
+    .zone-item {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 20px;
+        transition: all 0.3s ease;
+    }
+    
+    .zone-item:hover {
+        border-color: #FFD700;
+        box-shadow: 0 8px 25px rgba(255, 215, 0, 0.15);
+        transform: translateY(-3px);
+    }
+    
+    .zone-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 16px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .zone-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        color: #FFD700;
+        flex-shrink: 0;
+    }
+    
+    .zone-info {
+        flex: 1;
+    }
+    
+    .zone-name {
+        margin: 0 0 6px 0;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1a1a1a;
+    }
+    
+    .zone-price {
+        display: inline-flex;
+        align-items: center;
+        background: linear-gradient(135deg, #FFD700, #e6c200);
+        color: #1a1a1a;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+    
+    .zone-quartiers {
+        background: #f8fafc;
+        border-radius: 10px;
+        padding: 14px;
+    }
+    
+    .quartiers-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #64748b;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .quartiers-list {
+        color: #475569;
+        font-size: 0.9rem;
+        line-height: 1.6;
+    }
+    
+    @media (max-width: 768px) {
+        .zones-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,165 @@
+{% extends 'gestionnaire/base.html.twig' %}
+
+{% block title %}Commandes - Brasil Burger{% endblock %}
+
+{% block page_title %}Commandes{% endblock %}
+{% block page_subtitle %}Liste des commandes{% endblock %}
+{% block page_icon %}<i class="bi bi-receipt-cutoff"></i>{% endblock %}
+
+{% block body %}
+<!-- Filtres simples -->
+<div class="card mb-4">
+    <div class="card-body py-3">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-2">
+                <select name="etat" class="form-select form-select-sm">
+                    <option value="">Tous états</option>
+                    <option value="EN_ATTENTE" {{ filtres.etat == 'EN_ATTENTE' ? 'selected' }}>En attente</option>
+                    <option value="EN_PREPARATION" {{ filtres.etat == 'EN_PREPARATION' ? 'selected' }}>En préparation</option>
+                    <option value="PRETE" {{ filtres.etat == 'PRETE' ? 'selected' }}>Prête</option>
+                    <option value="TERMINEE" {{ filtres.etat == 'TERMINEE' ? 'selected' }}>Terminée</option>
+                    <option value="ANNULEE" {{ filtres.etat == 'ANNULEE' ? 'selected' }}>Annulée</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="type_service" class="form-select form-select-sm">
+                    <option value="">Tous types</option>
+                    <option value="SUR_PLACE" {{ filtres.type_service == 'SUR_PLACE' ? 'selected' }}>Sur place</option>
+                    <option value="A_EMPORTER" {{ filtres.type_service == 'A_EMPORTER' ? 'selected' }}>À emporter</option>
+                    <option value="LIVRAISON" {{ filtres.type_service == 'LIVRAISON' ? 'selected' }}>Livraison</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="date_debut" class="form-control form-control-sm" value="{{ filtres.date_debut }}">
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="date_fin" class="form-control form-control-sm" value="{{ filtres.date_fin }}">
+            </div>
+            <div class="col-md-3">
+                <input type="text" name="recherche" class="form-control form-control-sm" 
+                       placeholder="Rechercher..." value="{{ filtres.recherche }}">
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary btn-sm w-100">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Liste -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><strong>{{ pagination.totalItems }}</strong> commandes</span>
+        <a href="{{ path('app_gestionnaire_commandes_export', filtres) }}" class="btn btn-sm btn-success">
+            <i class="bi bi-download"></i> Export
+        </a>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>N°</th>
+                    <th>Client</th>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Montant</th>
+                    <th>État</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cmd in commandes %}
+                <tr>
+                    <td><strong>{{ cmd.numero }}</strong></td>
+                    <td>{{ cmd.client.nomComplet }}</td>
+                    <td>{{ cmd.dateCommande|date('d/m H:i') }}</td>
+                    <td>
+                        {% if cmd.isLivraison %}
+                            <span class="badge bg-info">Livraison</span>
+                        {% elseif cmd.typeService == 'SUR_PLACE' %}
+                            <span class="badge bg-warning text-dark">Sur place</span>
+                        {% else %}
+                            <span class="badge bg-secondary">À emporter</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ cmd.montantTotal|number_format(0, ',', ' ') }} F</td>
+                    <td>
+                        {% if cmd.etat == 'EN_ATTENTE' %}
+                            <span class="badge bg-warning text-dark">En attente</span>
+                        {% elseif cmd.etat == 'EN_PREPARATION' %}
+                            <span class="badge bg-primary">Préparation</span>
+                        {% elseif cmd.etat == 'PRETE' %}
+                            <span class="badge bg-info">Prête</span>
+                        {% elseif cmd.etat == 'TERMINEE' %}
+                            <span class="badge bg-success">Terminée</span>
+                        {% else %}
+                            <span class="badge bg-danger">Annulée</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1 flex-nowrap">
+                            <a href="{{ path('app_gestionnaire_commande_show', {id: cmd.id}) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            
+                            {% if cmd.etat == 'EN_ATTENTE' %}
+                            <form action="{{ path('app_gestionnaire_commande_preparer', {id: cmd.id}) }}" method="post">
+                                <input type="hidden" name="_token" value="{{ csrf_token('preparer_' ~ cmd.id) }}">
+                                <button class="btn btn-sm btn-info"><i class="bi bi-play"></i></button>
+                            </form>
+                            {% endif %}
+                            
+                            {% if cmd.etat == 'EN_PREPARATION' %}
+                            <form action="{{ path('app_gestionnaire_commande_prete', {id: cmd.id}) }}" method="post">
+                                <input type="hidden" name="_token" value="{{ csrf_token('prete_' ~ cmd.id) }}">
+                                <button class="btn btn-sm btn-warning"><i class="bi bi-check"></i></button>
+                            </form>
+                            {% endif %}
+                            
+                            {% if cmd.etat == 'PRETE' %}
+                            <form action="{{ path('app_gestionnaire_commande_terminer', {id: cmd.id}) }}" method="post">
+                                <input type="hidden" name="_token" value="{{ csrf_token('terminer_' ~ cmd.id) }}">
+                                <button class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i></button>
+                            </form>
+                            {% endif %}
+                            
+                            {% if cmd.etat not in ['TERMINEE', 'ANNULEE'] %}
+                            <form action="{{ path('app_gestionnaire_commande_annuler', {id: cmd.id}) }}" method="post"
+                                  onsubmit="return confirm('Annuler ?')">
+                                <input type="hidden" name="_token" value="{{ csrf_token('annuler_' ~ cmd.id) }}">
+                                <button class="btn btn-sm btn-danger"><i class="bi bi-x"></i></button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center py-4 text-muted">
+                        <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                        Aucune commande
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    {% if pagination.totalPages > 1 %}
+    <div class="card-footer">
+        <nav>
+            <ul class="pagination pagination-sm justify-content-center mb-0">
+                {% for p in 1..pagination.totalPages %}
+                <li class="page-item {{ p == pagination.page ? 'active' : '' }}">
+                    <a class="page-link" href="{{ path('app_gestionnaire_commandes', filtres|merge({page: p})) }}">{{ p }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

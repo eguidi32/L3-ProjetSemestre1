@@ -1,0 +1,235 @@
+{% extends 'gestionnaire/base.html.twig' %}
+
+{% block title %}Commande {{ commande.numero }} - Brasil Burger{% endblock %}
+
+{% block page_title %}Détails de la Commande{% endblock %}
+
+{% block body %}
+<div class="row">
+    <!-- Informations commande -->
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Commande {{ commande.numero }}</h5>
+                <span class="badge {{ commande.etatBadgeClass }} fs-6">{{ commande.etatLabel }}</span>
+            </div>
+            <div class="card-body">
+                <!-- Lignes de commande -->
+                <h6 class="mb-3">Articles commandés</h6>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Produit</th>
+                                <th>Type</th>
+                                <th class="text-center">Quantité</th>
+                                <th class="text-end">Prix unitaire</th>
+                                <th class="text-end">Sous-total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ligne in commande.lignesCommande %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        {% if ligne.produitImage %}
+                                        <img src="{{ ligne.produitImage }}" alt="" 
+                                             style="width: 40px; height: 40px; object-fit: cover; border-radius: 5px;" class="me-2">
+                                        {% endif %}
+                                        <strong>{{ ligne.produitNom }}</strong>
+                                    </div>
+                                    {% if ligne.ligneComplements|length > 0 %}
+                                    <small class="text-muted">
+                                        + {% for lc in ligne.ligneComplements %}{{ lc.complement.nom }}{% if not loop.last %}, {% endif %}{% endfor %}
+                                    </small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if ligne.typeProduit == 'BURGER' %}
+                                        <span class="badge bg-warning text-dark">Burger</span>
+                                    {% else %}
+                                        <span class="badge bg-info">Menu</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">{{ ligne.quantite }}</td>
+                                <td class="text-end">{{ ligne.prixUnitaire|number_format(0, ',', ' ') }} F</td>
+                                <td class="text-end"><strong>{{ ligne.sousTotal|number_format(0, ',', ' ') }} F</strong></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4" class="text-end"><strong>Total</strong></td>
+                                <td class="text-end"><strong class="text-success fs-5">{{ commande.montantTotal|number_format(0, ',', ' ') }} F</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions rapides -->
+        {% if commande.etat not in ['TERMINEE', 'ANNULEE'] %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-lightning me-2"></i>Actions rapides</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    {% if commande.etat == 'EN_ATTENTE' %}
+                    <form action="{{ path('app_gestionnaire_commande_preparer', {id: commande.id}) }}" method="post">
+                        <input type="hidden" name="_token" value="{{ csrf_token('preparer_' ~ commande.id) }}">
+                        <button type="submit" class="btn btn-info w-100">
+                            <i class="bi bi-fire me-2"></i>Mettre en préparation
+                        </button>
+                    </form>
+                    {% elseif commande.etat == 'EN_PREPARATION' %}
+                    <form action="{{ path('app_gestionnaire_commande_prete', {id: commande.id}) }}" method="post">
+                        <input type="hidden" name="_token" value="{{ csrf_token('prete_' ~ commande.id) }}">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-check2-circle me-2"></i>Marquer comme prête
+                        </button>
+                    </form>
+                    {% elseif commande.etat == 'PRETE' %}
+                    <form action="{{ path('app_gestionnaire_commande_terminer', {id: commande.id}) }}" method="post">
+                        <input type="hidden" name="_token" value="{{ csrf_token('terminer_' ~ commande.id) }}">
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="bi bi-check-lg me-2"></i>Terminer la commande
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Changer l'etat -->
+        {% if commande.etat not in ['TERMINEE', 'ANNULEE'] %}
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Changer l'état de la commande</h6>
+            </div>
+            <div class="card-body">
+                <form action="{{ path('app_gestionnaire_commande_changer_etat', {id: commande.id}) }}" method="post">
+                    <input type="hidden" name="_token" value="{{ csrf_token('changer_etat_' ~ commande.id) }}">
+                    <div class="row align-items-end">
+                        <div class="col-md-8">
+                            <label class="form-label">Nouvel état</label>
+                            <select name="etat" class="form-select">
+                                <option value="EN_ATTENTE" {{ commande.etat == 'EN_ATTENTE' ? 'selected' : '' }}>En attente</option>
+                                <option value="EN_PREPARATION" {{ commande.etat == 'EN_PREPARATION' ? 'selected' : '' }}>En préparation</option>
+                                <option value="PRETE" {{ commande.etat == 'PRETE' ? 'selected' : '' }}>Prête</option>
+                                <option value="TERMINEE" {{ commande.etat == 'TERMINEE' ? 'selected' : '' }}>Terminée</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-arrow-repeat me-2"></i>Mettre à jour
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Sidebar infos -->
+    <div class="col-lg-4">
+        <!-- Infos client -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-person me-2"></i>Client</h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-1"><strong>{{ commande.client.nomComplet }}</strong></p>
+                <p class="mb-1"><i class="bi bi-telephone me-2"></i>{{ commande.client.telephone }}</p>
+                <p class="mb-0"><i class="bi bi-envelope me-2"></i>{{ commande.client.email }}</p>
+            </div>
+        </div>
+
+        <!-- Infos livraison -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-truck me-2"></i>Service</h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-2">
+                    <strong>Type :</strong> {{ commande.typeServiceLabel }}
+                </p>
+                {% if commande.isLivraison %}
+                <p class="mb-2">
+                    <strong>Zone :</strong> {{ commande.zone ? commande.zone.nom : 'Non definie' }}
+                </p>
+                <p class="mb-2">
+                    <strong>Adresse :</strong><br>
+                    {{ commande.adresseLivraison ?: 'Non renseignee' }}
+                </p>
+                {% if commande.livreur %}
+                <p class="mb-0">
+                    <strong>Livreur :</strong> {{ commande.livreur.nomComplet }}
+                </p>
+                {% else %}
+                <p class="mb-0 text-warning">
+                    <i class="bi bi-exclamation-triangle me-1"></i>Livreur non affecte
+                </p>
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Infos paiement -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-credit-card me-2"></i>Paiement</h6>
+            </div>
+            <div class="card-body">
+                {% if commande.paiement %}
+                <p class="mb-2">
+                    <strong>Statut :</strong>
+                    {% if commande.paiement.valide %}
+                        <span class="badge bg-success">Valide</span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark">{{ commande.paiement.statut }}</span>
+                    {% endif %}
+                </p>
+                <p class="mb-2"><strong>Mode :</strong> {{ commande.paiement.modePaiementLabel }}</p>
+                <p class="mb-2"><strong>Reference :</strong> {{ commande.paiement.reference }}</p>
+                <p class="mb-0"><strong>Date :</strong> {{ commande.paiement.datePaiement|date('d/m/Y H:i') }}</p>
+                {% else %}
+                <p class="text-warning mb-0">
+                    <i class="bi bi-exclamation-triangle me-1"></i>Commande non payee
+                </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Date et heure -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-clock me-2"></i>Informations</h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-2"><strong>Date :</strong> {{ commande.dateCommande|date('d/m/Y') }}</p>
+                <p class="mb-0"><strong>Heure :</strong> {{ commande.dateCommande|date('H:i') }}</p>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="d-grid gap-2 mt-4">
+            <a href="{{ path('app_gestionnaire_commandes') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Retour a la liste
+            </a>
+            {% if commande.etat not in ['TERMINEE', 'ANNULEE'] %}
+            <form action="{{ path('app_gestionnaire_commande_annuler', {id: commande.id}) }}" method="post"
+                  onsubmit="return confirm('Etes-vous sur de vouloir annuler cette commande ?');">
+                <input type="hidden" name="_token" value="{{ csrf_token('annuler' ~ commande.id) }}">
+                <button type="submit" class="btn btn-danger w-100">
+                    <i class="bi bi-x-circle me-2"></i>Annuler la commande
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
