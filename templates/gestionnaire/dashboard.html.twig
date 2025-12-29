@@ -133,70 +133,66 @@
             </div>
             <div class="card-body p-0">
                 {% if commandesEnCours|length > 0 %}
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>N° Commande</th>
-                                <th>Client</th>
-                                <th>Type</th>
-                                <th>Montant</th>
-                                <th>État</th>
-                                <th>Temps écoulé</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for commande in commandesEnCours|slice(0, 10) %}
-                            {% set minutesEcoulees = date().diff(commande.dateCommande).i + (date().diff(commande.dateCommande).h * 60) %}
-                            <tr class="{% if minutesEcoulees >= 30 %}table-warning{% endif %}">
-                                <td>
-                                    <span class="order-number">#{{ commande.numero }}</span>
-                                    {% if minutesEcoulees >= 30 %}
-                                    <span class="badge bg-danger ms-1">URGENT</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="client-avatar">
-                                            {{ commande.client.prenom|first|upper }}
-                                        </div>
-                                        <div>
-                                            <strong>{{ commande.client.nomComplet }}</strong><br>
-                                            <small class="text-muted">{{ commande.client.telephone }}</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="type-badge {{ commande.isLivraison ? 'delivery' : 'pickup' }}">
-                                        <i class="bi bi-{{ commande.isLivraison ? 'truck' : 'shop' }}"></i>
-                                        {{ commande.typeServiceLabel }}
-                                    </span>
-                                </td>
-                                <td><strong>{{ commande.montantTotal|number_format(0, ',', ' ') }} FCFA</strong></td>
-                                <td><span class="badge {{ commande.etatBadgeClass }}">{{ commande.etatLabel }}</span></td>
-                                <td>
-                                    <span class="time-elapsed {% if minutesEcoulees >= 30 %}text-danger fw-bold{% endif %}">
-                                        <i class="bi bi-{% if minutesEcoulees >= 30 %}exclamation-triangle-fill{% else %}clock{% endif %}"></i>
-                                        {% if minutesEcoulees >= 60 %}
-                                            {{ (minutesEcoulees / 60)|number_format(0) }}h {{ minutesEcoulees % 60 }}min
-                                        {% else %}
-                                            {{ minutesEcoulees }} min
-                                        {% endif %}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="btn-group btn-group-sm">
-                                        <a href="{{ path('app_gestionnaire_commande_show', {id: commande.id}) }}" 
-                                           class="btn btn-outline-primary" title="Voir détails">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <div class="commandes-dashboard-container">
+                    <!-- En-tête de la grid -->
+                    <div class="commandes-grid-header">
+                        <div class="grid-header-cell">N°</div>
+                        <div class="grid-header-cell">État</div>
+                        <div class="grid-header-cell"></div>
+                        <div class="grid-header-cell">Type</div>
+                        <div class="grid-header-cell">Client</div>
+                        <div class="grid-header-cell">Temps</div>
+                        <div class="grid-header-cell">Montant</div>
+                        <div class="grid-header-cell">Actions</div>
+                    </div>
+                    
+                    <!-- Liste des commandes -->
+                    {% for commande in commandesEnCours|slice(0, 10) %}
+                    {% set minutesEcoulees = date().diff(commande.dateCommande).i + (date().diff(commande.dateCommande).h * 60) %}
+                    <div class="commande-dashboard-row {% if minutesEcoulees >= 30 %}urgent-row{% endif %}">
+                        <div class="grid-cell">
+                            <span class="order-number">#{{ commande.numero }}</span>
+                            {% if minutesEcoulees >= 30 %}
+                            <span class="badge bg-danger ms-1">URGENT</span>
+                            {% endif %}
+                        </div>
+                        <div class="grid-cell">
+                            <span class="badge {{ commande.etatBadgeClass }}">{{ commande.etatLabel }}</span>
+                        </div>
+                        <div class="grid-cell"></div>
+                        <div class="grid-cell">
+                            <span class="type-badge {{ commande.isLivraison ? 'delivery' : 'pickup' }}">
+                                <i class="bi bi-{{ commande.isLivraison ? 'truck' : 'shop' }}"></i>
+                                {{ commande.typeServiceLabel }}
+                            </span>
+                        </div>
+                        <div class="grid-cell">
+                            <div class="client-info">
+                                <div class="client-name">{{ commande.client.nomComplet }}</div>
+                                <div class="client-phone">{{ commande.client.telephone }}</div>
+                            </div>
+                        </div>
+                        <div class="grid-cell">
+                            <span class="time-elapsed {% if minutesEcoulees >= 30 %}text-danger fw-bold{% endif %}">
+                                <i class="bi bi-{% if minutesEcoulees >= 30 %}exclamation-triangle-fill{% else %}clock{% endif %}"></i>
+                                {% if minutesEcoulees >= 60 %}
+                                    {{ (minutesEcoulees / 60)|number_format(0) }}h {{ minutesEcoulees % 60 }}min
+                                {% else %}
+                                    {{ minutesEcoulees }}min
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="grid-cell">
+                            <div class="montant">{{ commande.montantTotal|number_format(0, ',', ' ') }} F</div>
+                        </div>
+                        <div class="grid-cell">
+                            <a href="{{ path('app_gestionnaire_commande_show', {id: commande.id}) }}" 
+                               class="btn btn-sm btn-outline-primary" title="Voir détails">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
                 </div>
                 {% else %}
                 <div class="empty-state">
@@ -394,6 +390,95 @@
         font-size: 0.6em;
         font-weight: 500;
     }
+
+    /* Styles pour la grille des commandes du dashboard */
+    .commandes-dashboard-container {
+        padding: 1rem;
+    }
+    
+    .commandes-grid-header {
+        display: grid;
+        grid-template-columns: 80px 90px 20px 80px 1fr 70px 90px 70px;
+        gap: 1rem;
+        padding: 0.75rem;
+        background: #f8fafc;
+        border-radius: 8px 8px 0 0;
+        border-bottom: 2px solid #e2e8f0;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+    
+    .commande-dashboard-row {
+        display: grid;
+        grid-template-columns: 80px 90px 20px 80px 1fr 70px 90px 70px;
+        gap: 1rem;
+        padding: 0.75rem;
+        align-items: center;
+        border-bottom: 1px solid #f1f5f9;
+        transition: all 0.2s ease;
+    }
+    
+    .commande-dashboard-row:hover {
+        background: #f8fafc;
+    }
+    
+    .commande-dashboard-row.urgent-row {
+        background: rgba(254, 243, 199, 0.5);
+        border-left: 4px solid #f59e0b;
+    }
+    
+    .grid-cell {
+        font-size: 0.875rem;
+        color: #334155;
+    }
+    
+    .grid-header-cell {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+    
+    .client-info {
+        line-height: 1.4;
+    }
+    
+    .client-name {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 0.875rem;
+    }
+    
+    .client-phone {
+        color: #64748b;
+        font-size: 0.75rem;
+    }
+    
+    .montant {
+        font-weight: 600;
+        color: #059669;
+    }
+    
+    .order-number {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 0.75rem;
+    }
+    
+    /* Responsive pour le dashboard */
+    @media (max-width: 1024px) {
+        .commandes-grid-header,
+        .commande-dashboard-row {
+                grid-template-columns: 70px 80px 15px 70px 1fr 60px 80px 60px;
+        .grid-header-cell,
+        .grid-cell {
+            font-size: 0.75rem;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -423,13 +508,5 @@
         }
     }
     {% endif %}
-    
-    // Bouton de refresh manuel
-    const refreshBtn = document.createElement('button');
-    refreshBtn.className = 'btn btn-sm btn-outline-secondary position-fixed bottom-0 end-0 m-3';
-    refreshBtn.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i>Actualiser';
-    refreshBtn.style.zIndex = '1000';
-    refreshBtn.onclick = () => location.reload();
-    document.body.appendChild(refreshBtn);
 </script>
 {% endblock %}
