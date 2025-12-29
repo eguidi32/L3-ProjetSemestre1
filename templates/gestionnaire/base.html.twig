@@ -17,7 +17,7 @@
     
     <style>
         :root {
-            --sidebar-width: 220px;
+            --sidebar-width: 200px;
             --primary-black: #1a1a1a;
             --primary-black-light: #2d2d2d;
             --primary-yellow: #FFD700;
@@ -121,7 +121,7 @@
         
         .sidebar-brand-text h2 {
             color: var(--primary-black);
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             font-weight: 700;
             margin: 0;
             text-shadow: 0 1px 2px rgba(255,255,255,0.3);
@@ -142,31 +142,31 @@
         }
         
         .nav-section {
-            padding: 0 10px;
-            margin-bottom: 20px;
+            padding: 0 15px;
+            margin-bottom: 15px;
         }
         
         .nav-section-title {
             color: var(--text-muted);
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 1.2px;
-            padding: 0 12px;
-            margin-bottom: 10px;
+            letter-spacing: 1.5px;
+            padding: 0 15px;
+            margin-bottom: 12px;
             font-weight: 600;
         }
         
         .nav-link {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px 12px;
+            gap: 12px;
+            padding: 12px 15px;
             color: var(--text-muted);
             text-decoration: none;
             border-radius: 10px;
             margin-bottom: 4px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             font-weight: 500;
             position: relative;
             overflow: hidden;
@@ -201,8 +201,8 @@
         }
         
         .nav-link i {
-            font-size: 1.1rem;
-            width: 22px;
+            font-size: 1.2rem;
+            width: 24px;
             text-align: center;
         }
         
@@ -826,13 +826,13 @@
                     <span>Commandes</span>
                 </a>
                 <a href="{{ path('app_gestionnaire_livraisons') }}" 
-                   class="nav-link {{ app.request.attributes.get('_route') == 'app_gestionnaire_livraisons' ? 'active' : '' }}">
+                   class="nav-link {{ 'livraison' in app.request.attributes.get('_route') and 'zone' not in app.request.attributes.get('_route') ? 'active' : '' }}">
                     <i class="bi bi-truck"></i>
                     <span>Livraisons</span>
                 </a>
-                <a href="{{ path('app_gestionnaire_livraison_zones') }}" 
-                   class="nav-link {{ app.request.attributes.get('_route') == 'app_gestionnaire_livraison_zones' ? 'active' : '' }}">
-                    <i class="bi bi-map"></i>
+                <a href="{{ path('app_gestionnaire_zones') }}" 
+                   class="nav-link {{ 'zone' in app.request.attributes.get('_route') ? 'active' : '' }}">
+                    <i class="bi bi-geo-alt-fill"></i>
                     <span>Zones</span>
                 </a>
             </div>

@@ -20,6 +20,8 @@ class StatistiqueController extends AbstractController
     #[Route('', name: 'app_gestionnaire_statistiques')]
     public function index(Request $request): Response
     {
+        set_time_limit(300);
+        
         // Date par défaut : aujourd'hui
         $dateStr = $request->query->get('date', date('Y-m-d'));
         

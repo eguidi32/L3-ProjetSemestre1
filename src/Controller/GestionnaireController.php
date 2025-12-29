@@ -15,6 +15,10 @@ class GestionnaireController extends AbstractController
     #[Route('', name: 'app_gestionnaire_dashboard')]
     public function dashboard(CommandeRepository $commandeRepository): Response
     {
+        // Augmenter le temps d'exécution pour éviter les timeouts
+        set_time_limit(300);
+        ini_set('max_execution_time', '300');
+        
         $now = new \DateTime();
         $today = new \DateTime('today');
         $yesterday = new \DateTime('yesterday');

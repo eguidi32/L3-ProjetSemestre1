@@ -58,28 +58,28 @@ class CommandeRepository extends ServiceEntityRepository
 
         if ($burgerId) {
             $qb->andWhere('lc.typeProduit = :typeBurger')
-                ->andWhere('lc.burger = :burgerId')
-                ->setParameter('typeBurger', 'BURGER')
-                ->setParameter('burgerId', $burgerId);
+               ->andWhere('lc.burger = :burgerId')
+               ->setParameter('typeBurger', 'BURGER')
+               ->setParameter('burgerId', $burgerId);
         }
 
         if ($menuId) {
             $qb->andWhere('lc.typeProduit = :typeMenu')
-                ->andWhere('lc.menu = :menuId')
-                ->setParameter('typeMenu', 'MENU')
-                ->setParameter('menuId', $menuId);
+               ->andWhere('lc.menu = :menuId')
+               ->setParameter('typeMenu', 'MENU')
+               ->setParameter('menuId', $menuId);
         }
 
         if ($recherche) {
             $qb->andWhere('(c.numero LIKE :recherche OR cl.nom LIKE :recherche OR cl.prenom LIKE :recherche OR cl.telephone LIKE :recherche)')
-                ->setParameter('recherche', '%' . $recherche . '%');
+               ->setParameter('recherche', '%' . $recherche . '%');
         }
 
         // Pagination
         $offset = ($page - 1) * $limit;
         $qb->distinct()
-            ->setFirstResult($offset)
-            ->setMaxResults($limit);
+           ->setFirstResult($offset)
+           ->setMaxResults($limit);
 
         return $qb->getQuery()->getResult();
     }
@@ -124,21 +124,21 @@ class CommandeRepository extends ServiceEntityRepository
 
         if ($burgerId) {
             $qb->andWhere('lc.typeProduit = :typeBurger')
-                ->andWhere('lc.burger = :burgerId')
-                ->setParameter('typeBurger', 'BURGER')
-                ->setParameter('burgerId', $burgerId);
+               ->andWhere('lc.burger = :burgerId')
+               ->setParameter('typeBurger', 'BURGER')
+               ->setParameter('burgerId', $burgerId);
         }
 
         if ($menuId) {
             $qb->andWhere('lc.typeProduit = :typeMenu')
-                ->andWhere('lc.menu = :menuId')
-                ->setParameter('typeMenu', 'MENU')
-                ->setParameter('menuId', $menuId);
+               ->andWhere('lc.menu = :menuId')
+               ->setParameter('typeMenu', 'MENU')
+               ->setParameter('menuId', $menuId);
         }
 
         if ($recherche) {
             $qb->andWhere('(c.numero LIKE :recherche OR cl.nom LIKE :recherche OR cl.prenom LIKE :recherche OR cl.telephone LIKE :recherche)')
-                ->setParameter('recherche', '%' . $recherche . '%');
+               ->setParameter('recherche', '%' . $recherche . '%');
         }
 
         return (int) $qb->getQuery()->getSingleScalarResult();
@@ -325,16 +325,12 @@ class CommandeRepository extends ServiceEntityRepository
 
         $result = $this->createQueryBuilder('c')
             ->select('SUM(c.montantTotal) as total')
-            ->leftJoin('c.paiement', 'p')
             ->where('c.dateCommande >= :today')
             ->andWhere('c.dateCommande < :tomorrow')
             ->andWhere('c.etat != :annulee')
-            ->andWhere('p.id IS NOT NULL')
-            ->andWhere('p.statut = :statut')
             ->setParameter('today', $today)
             ->setParameter('tomorrow', $tomorrow)
             ->setParameter('annulee', Commande::ETAT_ANNULEE)
-            ->setParameter('statut', 'VALIDE')
             ->getQuery()
             ->getSingleScalarResult();
 
@@ -375,16 +371,12 @@ class CommandeRepository extends ServiceEntityRepository
 
         $result = $this->createQueryBuilder('c')
             ->select('SUM(c.montantTotal) as total')
-            ->leftJoin('c.paiement', 'p')
             ->where('c.dateCommande >= :start')
             ->andWhere('c.dateCommande <= :end')
             ->andWhere('c.etat != :annulee')
-            ->andWhere('p.id IS NOT NULL')
-            ->andWhere('p.statut = :statut')
             ->setParameter('start', $startOfDay)
             ->setParameter('end', $endOfDay)
             ->setParameter('annulee', Commande::ETAT_ANNULEE)
-            ->setParameter('statut', 'VALIDE')
             ->getQuery()
             ->getSingleScalarResult();
 
@@ -395,16 +387,12 @@ class CommandeRepository extends ServiceEntityRepository
     {
         $result = $this->createQueryBuilder('c')
             ->select('SUM(c.montantTotal) as total')
-            ->leftJoin('c.paiement', 'p')
             ->where('c.dateCommande >= :start')
             ->andWhere('c.dateCommande <= :end')
             ->andWhere('c.etat != :annulee')
-            ->andWhere('p.id IS NOT NULL')
-            ->andWhere('p.statut = :statut')
             ->setParameter('start', $start)
             ->setParameter('end', $end)
             ->setParameter('annulee', Commande::ETAT_ANNULEE)
-            ->setParameter('statut', 'VALIDE')
             ->getQuery()
             ->getSingleScalarResult();
 

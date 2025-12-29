@@ -33,6 +33,8 @@ class CommandeController extends AbstractController
         BurgerRepository $burgerRepository,
         MenuRepository $menuRepository
     ): Response {
+        set_time_limit(300);
+        
         // Récupérer les filtres
         $etat = $request->query->get('etat');
         $typeService = $request->query->get('type_service');

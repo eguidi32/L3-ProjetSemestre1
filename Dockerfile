@@ -65,6 +65,9 @@ opcache.validate_timestamps=0\n\
 realpath_cache_size=4096K\n\
 realpath_cache_ttl=600' >> "$PHP_INI_DIR/conf.d/opcache.ini"
 
+# Copier la configuration PHP personnalisée
+COPY php-custom.ini "$PHP_INI_DIR/conf.d/custom.ini"
+
 WORKDIR /var/www/html
 
 # Copier l'application depuis le builder

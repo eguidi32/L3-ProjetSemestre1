@@ -12,8 +12,7 @@ class CommandeService
     public function __construct(
         private EntityManagerInterface $entityManager,
         private CommandeRepository $commandeRepository
-    ) {
-    }
+    ) {}
 
     /**
      * Change l'état d'une commande avec validation du workflow
@@ -21,14 +20,14 @@ class CommandeService
     public function changerEtat(Commande $commande, string $nouvelEtat): bool
     {
         $transitionsAutorisees = $this->getTransitionsAutorisees($commande->getEtat());
-
+        
         if (!in_array($nouvelEtat, $transitionsAutorisees)) {
             return false;
         }
 
         $commande->setEtat($nouvelEtat);
         $this->entityManager->flush();
-
+        
         return true;
     }
 
@@ -47,7 +46,7 @@ class CommandeService
 
         $commande->setEtat(Commande::ETAT_ANNULEE);
         $this->entityManager->flush();
-
+        
         return true;
     }
 
@@ -62,7 +61,7 @@ class CommandeService
 
         $commande->setEtat(Commande::ETAT_EN_PREPARATION);
         $this->entityManager->flush();
-
+        
         return true;
     }
 
@@ -77,7 +76,7 @@ class CommandeService
 
         $commande->setEtat(Commande::ETAT_PRETE);
         $this->entityManager->flush();
-
+        
         return true;
     }
 
@@ -92,7 +91,7 @@ class CommandeService
 
         $commande->setEtat(Commande::ETAT_TERMINEE);
         $this->entityManager->flush();
-
+        
         return true;
     }
 
@@ -101,7 +100,7 @@ class CommandeService
      */
     public function getTransitionsAutorisees(string $etatActuel): array
     {
-        return match ($etatActuel) {
+        return match($etatActuel) {
             Commande::ETAT_EN_ATTENTE => [Commande::ETAT_EN_PREPARATION],
             Commande::ETAT_EN_PREPARATION => [Commande::ETAT_PRETE],
             Commande::ETAT_PRETE => [Commande::ETAT_TERMINEE],
@@ -119,10 +118,10 @@ class CommandeService
         $response = new StreamedResponse();
         $response->setCallback(function () use ($commandes) {
             $handle = fopen('php://output', 'w+');
-
+            
             // En-têtes UTF-8 BOM pour Excel
-            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
-
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+            
             // En-têtes du CSV
             fputcsv($handle, [
                 'Numéro',
@@ -138,12 +137,12 @@ class CommandeService
                 'Zone',
                 'Livreur'
             ], ';');
-
+            
             // Données
             foreach ($commandes as $commande) {
                 fputcsv($handle, [
                     $commande->getNumero(),
-                    $commande->getDateCommande()->format('Y-m-d'),
+                    $commande->getDateCommande()->format('d/m/Y'),
                     $commande->getDateCommande()->format('H:i'),
                     $commande->getClient()->getNomComplet(),
                     $commande->getClient()->getTelephone(),
@@ -156,7 +155,7 @@ class CommandeService
                     $commande->getLivreur() ? $commande->getLivreur()->getNomComplet() : ''
                 ], ';');
             }
-
+            
             fclose($handle);
         });
 
@@ -173,12 +172,12 @@ class CommandeService
     {
         $nbArticles = 0;
         $nbComplements = 0;
-
+        
         foreach ($commande->getLignesCommande() as $ligne) {
             $nbArticles += $ligne->getQuantite();
             $nbComplements += count($ligne->getLigneComplements());
         }
-
+        
         return [
             'nbArticles' => $nbArticles,
             'nbComplements' => $nbComplements,
