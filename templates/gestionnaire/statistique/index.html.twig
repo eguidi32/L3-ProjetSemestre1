@@ -3,24 +3,28 @@
 {% block title %}Statistiques - Brasil Burger{% endblock %}
 
 {% block page_title %}Statistiques{% endblock %}
+{% block page_subtitle %}Analysez vos performances et ventes{% endblock %}
+{% block page_icon %}<i class="bi bi-bar-chart-line-fill"></i>{% endblock %}
 
 {% block body %}
-<!-- Selecteur de date -->
-<div class="card mb-4">
+<!-- Sélecteur de date -->
+<div class="card mb-4 fade-in-up">
     <div class="card-body">
         <form method="get" class="row align-items-end">
             <div class="col-md-3">
-                <label class="form-label">Date</label>
+                <label class="form-label">
+                    <i class="bi bi-calendar3 me-1"></i>Date d'analyse
+                </label>
                 <input type="date" name="date" class="form-control" value="{{ date|date('Y-m-d') }}">
             </div>
             <div class="col-md-2">
                 <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-search me-2"></i>Afficher
+                    <i class="bi bi-search me-2"></i>Analyser
                 </button>
             </div>
             <div class="col-md-7 text-end">
-                <a href="{{ path('app_gestionnaire_statistiques', {date: 'now'|date('Y-m-d')}) }}" class="btn btn-outline-secondary">
-                    Aujourd'hui
+                <a href="{{ path('app_gestionnaire_statistiques', {date: 'now'|date('Y-m-d')}) }}" class="btn btn-outline-primary">
+                    <i class="bi bi-calendar-check me-1"></i>Aujourd'hui
                 </a>
             </div>
         </form>
@@ -29,43 +33,51 @@
 
 <!-- Statistiques principales -->
 <div class="row g-4 mb-4">
-    <div class="col-md-6 col-lg-3">
-        <div class="stat-card">
-            <div class="icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card stat-info fade-in-up" style="animation-delay: 0.1s;">
+            <div class="icon">
                 <i class="bi bi-hourglass-split"></i>
             </div>
-            <h3>{{ stats.commandesEnCours }}</h3>
-            <p>Commandes en cours</p>
+            <div class="stat-content">
+                <h3>{{ stats.commandesEnCours }}</h3>
+                <p>Commandes en cours</p>
+            </div>
         </div>
     </div>
 
-    <div class="col-md-6 col-lg-3">
-        <div class="stat-card">
-            <div class="icon" style="background: rgba(34, 197, 94, 0.1); color: #22c55e;">
-                <i class="bi bi-check-circle"></i>
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card stat-success fade-in-up" style="animation-delay: 0.2s;">
+            <div class="icon">
+                <i class="bi bi-check-circle-fill"></i>
             </div>
-            <h3>{{ stats.commandesValidees }}</h3>
-            <p>Commandes validees</p>
+            <div class="stat-content">
+                <h3>{{ stats.commandesValidees }}</h3>
+                <p>Commandes validées</p>
+            </div>
         </div>
     </div>
 
-    <div class="col-md-6 col-lg-3">
-        <div class="stat-card">
-            <div class="icon" style="background: rgba(243, 156, 18, 0.1); color: #f39c12;">
-                <i class="bi bi-cash-stack"></i>
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card stat-warning fade-in-up" style="animation-delay: 0.3s;">
+            <div class="icon">
+                <i class="bi bi-currency-exchange"></i>
             </div>
-            <h3>{{ stats.recette|number_format(0, ',', ' ') }} F</h3>
-            <p>Recette journaliere</p>
+            <div class="stat-content">
+                <h3>{{ stats.recette|number_format(0, ',', ' ') }} <small>F</small></h3>
+                <p>Recette journalière</p>
+            </div>
         </div>
     </div>
 
-    <div class="col-md-6 col-lg-3">
-        <div class="stat-card">
-            <div class="icon" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
-                <i class="bi bi-x-circle"></i>
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card stat-danger fade-in-up" style="animation-delay: 0.4s;">
+            <div class="icon">
+                <i class="bi bi-x-octagon-fill"></i>
             </div>
-            <h3>{{ stats.commandesAnnulees }}</h3>
-            <p>Commandes annulees</p>
+            <div class="stat-content">
+                <h3>{{ stats.commandesAnnulees }}</h3>
+                <p>Commandes annulées</p>
+            </div>
         </div>
     </div>
 </div>
@@ -73,31 +85,36 @@
 <!-- Statistiques secondaires -->
 <div class="row g-4 mb-4">
     <div class="col-md-6">
-        <div class="stat-card">
-            <div class="icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+        <div class="stat-card stat-purple fade-in-up" style="animation-delay: 0.5s;">
+            <div class="icon">
                 <i class="bi bi-receipt"></i>
             </div>
-            <h3>{{ stats.totalCommandes }}</h3>
-            <p>Total commandes du jour</p>
+            <div class="stat-content">
+                <h3>{{ stats.totalCommandes }}</h3>
+                <p>Total commandes du jour</p>
+            </div>
         </div>
     </div>
     <div class="col-md-6">
-        <div class="stat-card">
-            <div class="icon" style="background: rgba(6, 182, 212, 0.1); color: #06b6d4;">
-                <i class="bi bi-cart"></i>
+        <div class="stat-card stat-info fade-in-up" style="animation-delay: 0.6s;">
+            <div class="icon">
+                <i class="bi bi-cart-check"></i>
             </div>
-            <h3>{{ stats.panierMoyen|number_format(0, ',', ' ') }} F</h3>
-            <p>Panier moyen</p>
+            <div class="stat-content">
+                <h3>{{ stats.panierMoyen|number_format(0, ',', ' ') }} <small>F</small></h3>
+                <p>Panier moyen</p>
+            </div>
         </div>
     </div>
 </div>
 
 <div class="row g-4">
-    <!-- Repartition par type de service -->
+    <!-- Répartition par type de service -->
     <div class="col-lg-4">
-        <div class="card h-100">
+        <div class="card h-100 fade-in-up" style="animation-delay: 0.7s;">
             <div class="card-header">
-                <h6 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Repartition par type</h6>
+                <i class="bi bi-pie-chart-fill"></i>
+                <span>Répartition par type</span>
             </div>
             <div class="card-body">
                 <div style="position: relative; height: 250px;">
@@ -105,12 +122,12 @@
                 </div>
                 <div class="mt-3">
                     {% for key, data in commandesParType %}
-                    <div class="d-flex justify-content-between small mb-1">
-                        <span>
+                    <div class="d-flex justify-content-between small mb-2">
+                        <span class="d-flex align-items-center gap-2">
                             <span class="badge {% if key == 'SUR_PLACE' %}bg-primary{% elseif key == 'A_EMPORTER' %}bg-warning{% else %}bg-success{% endif %}">{{ data.total }}</span>
-                            {{ data.label }}
+                            <span>{{ data.label }}</span>
                         </span>
-                        <span class="text-muted">{{ data.montant|number_format(0, ',', ' ') }} F</span>
+                        <span class="fw-semibold">{{ data.montant|number_format(0, ',', ' ') }} F</span>
                     </div>
                     {% endfor %}
                 </div>
@@ -120,31 +137,35 @@
 
     <!-- Burgers les plus vendus -->
     <div class="col-lg-4">
-        <div class="card h-100">
+        <div class="card h-100 fade-in-up" style="animation-delay: 0.8s;">
             <div class="card-header">
-                <h6 class="mb-0"><i class="bi bi-trophy me-2"></i>Burgers les plus vendus</h6>
+                <i class="bi bi-trophy-fill" style="color: gold;"></i>
+                <span>Burgers les plus vendus</span>
             </div>
             <div class="card-body p-0">
                 {% if produitsVendus.burgers|length > 0 %}
                 <ul class="list-group list-group-flush">
                     {% for burger in produitsVendus.burgers %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center">
+                        <div class="d-flex align-items-center gap-2">
                             {% if burger.image %}
-                            <img src="{{ burger.image }}" alt="" style="width: 40px; height: 40px; object-fit: cover; border-radius: 5px;" class="me-2">
+                            <img src="{{ burger.image }}" alt="" class="product-thumb">
+                            {% else %}
+                            <div class="product-thumb-placeholder"></div>
                             {% endif %}
-                            <span>{{ burger.nom }}</span>
+                            <span class="fw-medium">{{ burger.nom }}</span>
                         </div>
                         <div class="text-end">
                             <span class="badge bg-primary">{{ burger.quantite }} vendus</span><br>
-                            <small class="text-muted">{{ burger.chiffre|number_format(0, ',', ' ') }} F</small>
+                            <small class="text-success fw-semibold">{{ burger.chiffre|number_format(0, ',', ' ') }} F</small>
                         </div>
                     </li>
                     {% endfor %}
                 </ul>
                 {% else %}
-                <div class="text-center py-4 text-muted">
-                    <p class="mb-0">Aucune vente de burger</p>
+                <div class="empty-state py-4">
+                    <i class="bi bi-emoji-neutral" style="font-size: 2rem;"></i>
+                    <p class="mb-0 mt-2">Aucune vente de burger</p>
                 </div>
                 {% endif %}
             </div>
@@ -153,31 +174,35 @@
 
     <!-- Menus les plus vendus -->
     <div class="col-lg-4">
-        <div class="card h-100">
+        <div class="card h-100 fade-in-up" style="animation-delay: 0.9s;">
             <div class="card-header">
-                <h6 class="mb-0"><i class="bi bi-award me-2"></i>Menus les plus vendus</h6>
+                <i class="bi bi-award-fill" style="color: #8b5cf6;"></i>
+                <span>Menus les plus vendus</span>
             </div>
             <div class="card-body p-0">
                 {% if produitsVendus.menus|length > 0 %}
                 <ul class="list-group list-group-flush">
                     {% for menu in produitsVendus.menus %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center">
+                        <div class="d-flex align-items-center gap-2">
                             {% if menu.image %}
-                            <img src="{{ menu.image }}" alt="" style="width: 40px; height: 40px; object-fit: cover; border-radius: 5px;" class="me-2">
+                            <img src="{{ menu.image }}" alt="" class="product-thumb">
+                            {% else %}
+                            <div class="product-thumb-placeholder">🍽️</div>
                             {% endif %}
-                            <span>{{ menu.nom }}</span>
+                            <span class="fw-medium">{{ menu.nom }}</span>
                         </div>
                         <div class="text-end">
                             <span class="badge bg-info">{{ menu.quantite }} vendus</span><br>
-                            <small class="text-muted">{{ menu.chiffre|number_format(0, ',', ' ') }} F</small>
+                            <small class="text-success fw-semibold">{{ menu.chiffre|number_format(0, ',', ' ') }} F</small>
                         </div>
                     </li>
                     {% endfor %}
                 </ul>
                 {% else %}
-                <div class="text-center py-4 text-muted">
-                    <p class="mb-0">Aucune vente de menu</p>
+                <div class="empty-state py-4">
+                    <i class="bi bi-emoji-neutral" style="font-size: 2rem;"></i>
+                    <p class="mb-0 mt-2">Aucune vente de menu</p>
                 </div>
                 {% endif %}
             </div>
@@ -364,4 +389,42 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .stat-card h3 small {
+        font-size: 0.6em;
+        font-weight: 500;
+    }
+    
+    .product-thumb {
+        width: 45px;
+        height: 45px;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 2px solid #f1f5f9;
+    }
+    
+    .product-thumb-placeholder {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+    }
+    
+    .list-group-item {
+        padding: 15px 20px;
+        border-left: none;
+        border-right: none;
+    }
+    
+    .list-group-item:first-child {
+        border-top: none;
+    }
+</style>
 {% endblock %}

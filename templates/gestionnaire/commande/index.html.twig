@@ -3,180 +3,774 @@
 {% block title %}Gestion des Commandes - Brasil Burger{% endblock %}
 
 {% block page_title %}Gestion des Commandes{% endblock %}
+{% block page_subtitle %}Gérez et suivez toutes les commandes{% endblock %}
+{% block page_icon %}<i class="bi bi-receipt-cutoff"></i>{% endblock %}
 
 {% block body %}
 <!-- Filtres -->
-<div class="card mb-4">
-    <div class="card-header">
-        <h6 class="mb-0"><i class="bi bi-funnel me-2"></i>Filtres</h6>
-    </div>
-    <div class="card-body">
-        <form method="get" action="{{ path('app_gestionnaire_commandes') }}">
-            <div class="row g-3">
-                <div class="col-md-2">
-                    <label class="form-label">Etat</label>
-                    <select name="etat" class="form-select form-select-sm">
-                        <option value="">Tous</option>
-                        <option value="EN_ATTENTE" {{ filtres.etat == 'EN_ATTENTE' ? 'selected' : '' }}>En attente</option>
-                        <option value="EN_PREPARATION" {{ filtres.etat == 'EN_PREPARATION' ? 'selected' : '' }}>En preparation</option>
-                        <option value="PRETE" {{ filtres.etat == 'PRETE' ? 'selected' : '' }}>Prete</option>
-                        <option value="TERMINEE" {{ filtres.etat == 'TERMINEE' ? 'selected' : '' }}>Terminee</option>
-                        <option value="ANNULEE" {{ filtres.etat == 'ANNULEE' ? 'selected' : '' }}>Annulee</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Type service</label>
-                    <select name="type_service" class="form-select form-select-sm">
-                        <option value="">Tous</option>
-                        <option value="SUR_PLACE" {{ filtres.type_service == 'SUR_PLACE' ? 'selected' : '' }}>Sur place</option>
-                        <option value="A_EMPORTER" {{ filtres.type_service == 'A_EMPORTER' ? 'selected' : '' }}>A emporter</option>
-                        <option value="LIVRAISON" {{ filtres.type_service == 'LIVRAISON' ? 'selected' : '' }}>Livraison</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Burger</label>
-                    <select name="burger" class="form-select form-select-sm">
-                        <option value="">Tous</option>
-                        {% for burger in burgers %}
-                        <option value="{{ burger.id }}" {{ filtres.burger == burger.id ? 'selected' : '' }}>
-                            {{ burger.nom }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Menu</label>
-                    <select name="menu" class="form-select form-select-sm">
-                        <option value="">Tous</option>
-                        {% for menu in menus %}
-                        <option value="{{ menu.id }}" {{ filtres.menu == menu.id ? 'selected' : '' }}>
-                            {{ menu.nom }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Client</label>
-                    <select name="client" class="form-select form-select-sm">
-                        <option value="">Tous</option>
-                        {% for client in clients %}
-                        <option value="{{ client.id }}" {{ filtres.client == client.id ? 'selected' : '' }}>
-                            {{ client.nomComplet }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Date debut</label>
-                    <input type="date" name="date_debut" class="form-control form-control-sm" value="{{ filtres.date_debut }}">
-                </div>
+<div class="filters-container">
+    <form method="get" action="{{ path('app_gestionnaire_commandes') }}">
+        <!-- Barre de recherche principale -->
+        <div class="search-bar">
+            <div class="search-input-wrapper">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" name="recherche" class="search-input" 
+                       placeholder="Rechercher par n° commande, nom client, téléphone..." value="{{ filtres.recherche }}">
             </div>
-            <div class="row g-3 mt-1">
-                <div class="col-md-2">
-                    <label class="form-label">Date fin</label>
-                    <input type="date" name="date_fin" class="form-control form-control-sm" value="{{ filtres.date_fin }}">
+            <button type="submit" class="search-btn">
+                <i class="bi bi-search me-2"></i>Rechercher
+            </button>
+        </div>
+        
+        <!-- Filtres rapides par état -->
+        <div class="quick-filters">
+            <a href="{{ path('app_gestionnaire_commandes') }}" 
+               class="quick-filter-btn {{ not filtres.etat ? 'active' : '' }}">
+                <i class="bi bi-grid-3x3-gap"></i> Tous
+            </a>
+            <a href="{{ path('app_gestionnaire_commandes', {etat: 'EN_ATTENTE'}) }}" 
+               class="quick-filter-btn en-attente {{ filtres.etat == 'EN_ATTENTE' ? 'active' : '' }}">
+                <i class="bi bi-hourglass-split"></i> En attente
+            </a>
+            <a href="{{ path('app_gestionnaire_commandes', {etat: 'EN_PREPARATION'}) }}" 
+               class="quick-filter-btn en-preparation {{ filtres.etat == 'EN_PREPARATION' ? 'active' : '' }}">
+                <i class="bi bi-fire"></i> En préparation
+            </a>
+            <a href="{{ path('app_gestionnaire_commandes', {etat: 'PRETE'}) }}" 
+               class="quick-filter-btn prete {{ filtres.etat == 'PRETE' ? 'active' : '' }}">
+                <i class="bi bi-check-circle"></i> Prêtes
+            </a>
+            <a href="{{ path('app_gestionnaire_commandes', {etat: 'TERMINEE'}) }}" 
+               class="quick-filter-btn terminee {{ filtres.etat == 'TERMINEE' ? 'active' : '' }}">
+                <i class="bi bi-check-all"></i> Terminées
+            </a>
+            <a href="{{ path('app_gestionnaire_commandes', {etat: 'ANNULEE'}) }}" 
+               class="quick-filter-btn annulee {{ filtres.etat == 'ANNULEE' ? 'active' : '' }}">
+                <i class="bi bi-x-circle"></i> Annulées
+            </a>
+        </div>
+        
+        <!-- Filtres avancés (repliables) -->
+        <details class="advanced-filters">
+            <summary class="advanced-filters-toggle">
+                <i class="bi bi-sliders"></i>
+                <span>Filtres avancés</span>
+                <i class="bi bi-chevron-down toggle-icon"></i>
+            </summary>
+            <div class="advanced-filters-content">
+                <div class="filters-grid">
+                    <div class="filter-item">
+                        <label class="filter-label">
+                            <i class="bi bi-bag"></i> Type de service
+                        </label>
+                        <select name="type_service" class="filter-select">
+                            <option value="">Tous les types</option>
+                            <option value="SUR_PLACE" {{ filtres.type_service == 'SUR_PLACE' ? 'selected' : '' }}>Sur place</option>
+                            <option value="A_EMPORTER" {{ filtres.type_service == 'A_EMPORTER' ? 'selected' : '' }}>À emporter</option>
+                            <option value="LIVRAISON" {{ filtres.type_service == 'LIVRAISON' ? 'selected' : '' }}>Livraison</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label class="filter-label">
+                            <i class="bi bi-egg-fried"></i> Burger
+                        </label>
+                        <select name="burger" class="filter-select">
+                            <option value="">Tous les burgers</option>
+                            {% for burger in burgers %}
+                            <option value="{{ burger.id }}" {{ filtres.burger == burger.id ? 'selected' : '' }}>
+                                {{ burger.nom }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label class="filter-label">
+                            <i class="bi bi-journal-text"></i> Menu
+                        </label>
+                        <select name="menu" class="filter-select">
+                            <option value="">Tous les menus</option>
+                            {% for menu in menus %}
+                            <option value="{{ menu.id }}" {{ filtres.menu == menu.id ? 'selected' : '' }}>
+                                {{ menu.nom }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label class="filter-label">
+                            <i class="bi bi-person"></i> Client
+                        </label>
+                        <select name="client" class="filter-select">
+                            <option value="">Tous les clients</option>
+                            {% for client in clients %}
+                            <option value="{{ client.id }}" {{ filtres.client == client.id ? 'selected' : '' }}>
+                                {{ client.nomComplet }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label class="filter-label">
+                            <i class="bi bi-calendar-event"></i> Date début
+                        </label>
+                        <input type="date" name="date_debut" class="filter-input" value="{{ filtres.date_debut }}">
+                    </div>
+                    <div class="filter-item">
+                        <label class="filter-label">
+                            <i class="bi bi-calendar-check"></i> Date fin
+                        </label>
+                        <input type="date" name="date_fin" class="filter-input" value="{{ filtres.date_fin }}">
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Recherche (numéro, nom, téléphone)</label>
-                    <input type="text" name="recherche" class="form-control form-control-sm" 
-                           placeholder="Rechercher..." value="{{ filtres.recherche }}">
-                </div>
-                <div class="col-md-4 d-flex align-items-end gap-2">
-                    <button type="submit" class="btn btn-primary btn-sm">
-                        <i class="bi bi-search me-1"></i> Filtrer
+                <div class="filters-actions">
+                    <button type="submit" class="btn-filter-apply">
+                        <i class="bi bi-funnel-fill me-2"></i>Appliquer les filtres
                     </button>
-                    <a href="{{ path('app_gestionnaire_commandes') }}" class="btn btn-secondary btn-sm">
-                        <i class="bi bi-x-lg me-1"></i> Reset
+                    <a href="{{ path('app_gestionnaire_commandes') }}" class="btn-filter-reset">
+                        <i class="bi bi-arrow-counterclockwise me-2"></i>Réinitialiser
                     </a>
                 </div>
             </div>
-        </form>
-    </div>
+        </details>
+    </form>
 </div>
 
 <!-- Liste des commandes -->
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Liste des commandes</h5>
-        <span class="badge bg-primary">{{ commandes|length }} commande(s)</span>
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-list-ul"></i>
+            <span>Liste des commandes</span>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <a href="{{ path('app_gestionnaire_commandes_export', filtres) }}" class="btn btn-sm btn-success">
+                <i class="bi bi-file-earmark-excel me-1"></i> Exporter CSV
+            </a>
+            <span class="total-badge">
+                <i class="bi bi-receipt"></i>
+                {{ pagination.totalItems }} commande(s)
+            </span>
+        </div>
     </div>
     <div class="card-body">
         {% if commandes|length > 0 %}
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead>
-                    <tr>
-                        <th>N Commande</th>
-                        <th>Client</th>
-                        <th>Date</th>
-                        <th>Type</th>
-                        <th>Montant</th>
-                        <th>Paiement</th>
-                        <th>Etat</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for commande in commandes %}
-                    <tr>
-                        <td><strong>{{ commande.numero }}</strong></td>
-                        <td>
-                            {{ commande.client.nomComplet }}<br>
-                            <small class="text-muted">{{ commande.client.telephone }}</small>
-                        </td>
-                        <td>
-                            {{ commande.dateCommande|date('d/m/Y') }}<br>
-                            <small class="text-muted">{{ commande.dateCommande|date('H:i') }}</small>
-                        </td>
-                        <td>{{ commande.typeServiceLabel }}</td>
-                        <td><strong>{{ commande.montantTotal|number_format(0, ',', ' ') }} F</strong></td>
-                        <td>
-                            {% if commande.paye %}
-                                <span class="badge bg-success">Paye</span>
-                            {% else %}
-                                <span class="badge bg-warning text-dark">Non paye</span>
-                            {% endif %}
-                        </td>
-                        <td><span class="badge {{ commande.etatBadgeClass }}">{{ commande.etatLabel }}</span></td>
-                        <td>
-                            <div class="btn-group" role="group">
-                                <a href="{{ path('app_gestionnaire_commande_show', {id: commande.id}) }}" 
-                                   class="btn btn-sm btn-outline-info" title="Details">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                                {% if commande.etat == 'PRETE' %}
-                                <form action="{{ path('app_gestionnaire_commande_terminer', {id: commande.id}) }}" 
-                                      method="post" style="display: inline;">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('terminer' ~ commande.id) }}">
-                                    <button type="submit" class="btn btn-sm btn-outline-success" title="Terminer">
-                                        <i class="bi bi-check-lg"></i>
-                                    </button>
-                                </form>
-                                {% endif %}
-                                {% if commande.etat not in ['TERMINEE', 'ANNULEE'] %}
-                                <form action="{{ path('app_gestionnaire_commande_annuler', {id: commande.id}) }}" 
-                                      method="post" style="display: inline;"
-                                      onsubmit="return confirm('Etes-vous sur de vouloir annuler cette commande ?');">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('annuler' ~ commande.id) }}">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Annuler">
-                                        <i class="bi bi-x-lg"></i>
-                                    </button>
-                                </form>
-                                {% endif %}
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <!-- En-tête de la liste -->
+        <div class="commandes-header">
+            <span class="col-numero">N° Commande</span>
+            <span class="col-etat">État</span>
+            <span class="col-type">Type</span>
+            <span class="col-client">Client</span>
+            <span class="col-date">Date</span>
+            <span class="col-zone">Zone</span>
+            <span class="col-montant">Montant</span>
+            <span class="col-actions">Actions</span>
+        </div>
+        <div class="commandes-list">
+            {% for commande in commandes %}
+            <div class="commande-row {{ commande.etat|lower }}">
+                <span class="col-numero">#{{ commande.numero|slice(-8) }}</span>
+                <span class="col-etat"><span class="etat-badge {{ commande.etatBadgeClass }}">{{ commande.etatLabel }}</span></span>
+                <span class="col-type"><span class="type-badge {{ commande.isLivraison ? 'delivery' : (commande.typeServiceLabel == 'Sur place' ? 'dine-in' : 'takeaway') }}">{{ commande.typeServiceLabel }}</span></span>
+                <div class="col-client">
+                    <span class="client-name">{{ commande.client.nomComplet }}</span>
+                    <span class="client-phone">{{ commande.client.telephone }}</span>
+                </div>
+                <div class="col-date">
+                    <span>{{ commande.dateCommande|date('d/m/Y') }}</span>
+                    <span class="time">{{ commande.dateCommande|date('H:i') }}</span>
+                </div>
+                <span class="col-zone">
+                    {% if commande.zone %}
+                        {{ commande.zone.nom }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </span>
+                <div class="col-montant">
+                    <span class="montant">{{ commande.montantTotal|number_format(0, ',', ' ') }} F</span>
+                    {% if commande.paye %}
+                        <span class="paiement-badge paid">Payé</span>
+                    {% else %}
+                        <span class="paiement-badge unpaid">Non payé</span>
+                    {% endif %}
+                </div>
+                <div class="col-actions">
+                        <a href="{{ path('app_gestionnaire_commande_show', {id: commande.id}) }}" 
+                           class="action-btn view" title="Voir les détails">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        {% if commande.etat == 'EN_ATTENTE' %}
+                        <form action="{{ path('app_gestionnaire_commande_preparer', {id: commande.id}) }}" 
+                              method="post" class="d-inline">
+                            <input type="hidden" name="_token" value="{{ csrf_token('preparer_' ~ commande.id) }}">
+                            <button type="submit" class="action-btn prepare" title="Préparer">
+                                <i class="bi bi-fire"></i>
+                            </button>
+                        </form>
+                        {% endif %}
+                        {% if commande.etat == 'EN_PREPARATION' %}
+                        <form action="{{ path('app_gestionnaire_commande_prete', {id: commande.id}) }}" 
+                              method="post" class="d-inline">
+                            <input type="hidden" name="_token" value="{{ csrf_token('prete_' ~ commande.id) }}">
+                            <button type="submit" class="action-btn ready" title="Marquer prête">
+                                <i class="bi bi-check2-circle"></i>
+                            </button>
+                        </form>
+                        {% endif %}
+                        {% if commande.etat == 'PRETE' %}
+                        <form action="{{ path('app_gestionnaire_commande_terminer', {id: commande.id}) }}" 
+                              method="post" class="d-inline">
+                            <input type="hidden" name="_token" value="{{ csrf_token('terminer_' ~ commande.id) }}">
+                            <button type="submit" class="action-btn complete" title="Terminer">
+                                <i class="bi bi-check-lg"></i>
+                            </button>
+                        </form>
+                        {% endif %}
+                        {% if commande.etat not in ['TERMINEE', 'ANNULEE'] %}
+                        <form action="{{ path('app_gestionnaire_commande_annuler', {id: commande.id}) }}" 
+                              method="post" class="d-inline"
+                              onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette commande ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('annuler_' ~ commande.id) }}">
+                            <button type="submit" class="action-btn cancel" title="Annuler">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </form>
+                        {% endif %}
+                </div>
+            </div>
+            {% endfor %}
         </div>
         {% else %}
-        <div class="text-center py-5 text-muted">
-            <i class="bi bi-inbox" style="font-size: 4rem;"></i>
-            <h4 class="mt-3">Aucune commande trouvee</h4>
+        <div class="empty-state">
+            <i class="bi bi-inbox"></i>
+            <h5>Aucune commande trouvée</h5>
             <p>Modifiez vos filtres ou attendez de nouvelles commandes</p>
         </div>
         {% endif %}
     </div>
+    
+    {# Pagination #}
+    {% if pagination.totalPages > 1 %}
+    <div class="card-footer bg-transparent">
+        <nav aria-label="Navigation des commandes">
+            <ul class="pagination justify-content-center mb-0">
+                {# Bouton Précédent #}
+                <li class="page-item {{ pagination.page <= 1 ? 'disabled' : '' }}">
+                    <a class="page-link" href="{{ path('app_gestionnaire_commandes', filtres|merge({page: pagination.page - 1})) }}" 
+                       {% if pagination.page <= 1 %}tabindex="-1" aria-disabled="true"{% endif %}>
+                        <i class="bi bi-chevron-left"></i> Préc.
+                    </a>
+                </li>
+                
+                {# Numéros de page #}
+                {% set startPage = max(1, pagination.page - 2) %}
+                {% set endPage = min(pagination.totalPages, pagination.page + 2) %}
+                
+                {% if startPage > 1 %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ path('app_gestionnaire_commandes', filtres|merge({page: 1})) }}">1</a>
+                </li>
+                {% if startPage > 2 %}
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+                {% endif %}
+                {% endif %}
+                
+                {% for p in startPage..endPage %}
+                <li class="page-item {{ p == pagination.page ? 'active' : '' }}">
+                    <a class="page-link" href="{{ path('app_gestionnaire_commandes', filtres|merge({page: p})) }}">{{ p }}</a>
+                </li>
+                {% endfor %}
+                
+                {% if endPage < pagination.totalPages %}
+                {% if endPage < pagination.totalPages - 1 %}
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+                {% endif %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ path('app_gestionnaire_commandes', filtres|merge({page: pagination.totalPages})) }}">{{ pagination.totalPages }}</a>
+                </li>
+                {% endif %}
+                
+                {# Bouton Suivant #}
+                <li class="page-item {{ pagination.page >= pagination.totalPages ? 'disabled' : '' }}">
+                    <a class="page-link" href="{{ path('app_gestionnaire_commandes', filtres|merge({page: pagination.page + 1})) }}"
+                       {% if pagination.page >= pagination.totalPages %}tabindex="-1" aria-disabled="true"{% endif %}>
+                        Suiv. <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <div class="text-center mt-2 text-muted small">
+            Affichage de {{ ((pagination.page - 1) * pagination.itemsPerPage) + 1 }} 
+            à {{ min(pagination.page * pagination.itemsPerPage, pagination.totalItems) }} 
+            sur {{ pagination.totalItems }} commandes
+        </div>
+    </div>
+    {% endif %}
 </div>
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+    /* ========== FILTRES ========== */
+    .filters-container {
+        background: white;
+        border-radius: 12px;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid #e9ecef;
+    }
+    
+    /* Barre de recherche */
+    .search-bar {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+    }
+    
+    .search-input-wrapper {
+        flex: 1;
+        position: relative;
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: 1.25rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 1.1rem;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 0.85rem 1rem 0.85rem 3rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        background: #fafafa;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: #FFD700;
+        background: white;
+    }
+    
+    .search-input::placeholder {
+        color: #9ca3af;
+    }
+    
+    .search-btn {
+        padding: 1rem 2rem;
+        background: #FFD700;
+        border: none;
+        border-radius: 10px;
+        color: #1a1a1a;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+        white-space: nowrap;
+    }
+    
+    .search-btn:hover {
+        background: #e6c200;
+    }
+    
+    /* Filtres rapides */
+    .quick-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .quick-filter-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-decoration: none;
+        color: #4b5563;
+        background: #f3f4f6;
+        border: 1px solid #e5e7eb;
+        transition: background 0.2s;
+    }
+    
+    .quick-filter-btn:hover {
+        background: #e5e7eb;
+    }
+    
+    .quick-filter-btn.active {
+        font-weight: 600;
+    }
+    
+    .quick-filter-btn.active { background: #FFD700; color: #1a1a1a; border-color: #FFD700; }
+    .quick-filter-btn.en-attente.active { background: #ffc107; color: #1a1a1a; border-color: #ffc107; }
+    .quick-filter-btn.en-preparation.active { background: #17a2b8; color: white; border-color: #17a2b8; }
+    .quick-filter-btn.prete.active { background: #28a745; color: white; border-color: #28a745; }
+    .quick-filter-btn.terminee.active { background: #6c757d; color: white; border-color: #6c757d; }
+    .quick-filter-btn.annulee.active { background: #dc3545; color: white; border-color: #dc3545; }
+    
+    /* Filtres avancés */
+    .advanced-filters {
+        border-top: 1px solid #e5e7eb;
+        padding-top: 1rem;
+    }
+    
+    .advanced-filters-toggle {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        background: #f9fafb;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 500;
+        color: #4b5563;
+        transition: all 0.3s ease;
+        list-style: none;
+    }
+    
+    .advanced-filters-toggle::-webkit-details-marker {
+        display: none;
+    }
+    
+    .advanced-filters-toggle:hover {
+        background: #f3f4f6;
+        color: #1f2937;
+    }
+    
+    .advanced-filters[open] .toggle-icon {
+        transform: rotate(180deg);
+    }
+    
+    .toggle-icon {
+        margin-left: auto;
+        transition: transform 0.3s ease;
+    }
+    
+    .advanced-filters-content {
+        padding-top: 1.25rem;
+    }
+    
+    .filters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+    }
+    
+    .filter-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .filter-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+    }
+    
+    .filter-label i {
+        color: #9ca3af;
+    }
+    
+    .filter-select,
+    .filter-input {
+        padding: 0.75rem 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        background: white;
+        transition: all 0.3s ease;
+    }
+    
+    .filter-select:focus,
+    .filter-input:focus {
+        outline: none;
+        border-color: #FFD700;
+        box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.15);
+    }
+    
+    .filters-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+    }
+    
+    .btn-filter-apply {
+        padding: 0.75rem 1.5rem;
+        background: #FFD700;
+        border: none;
+        border-radius: 8px;
+        color: #1a1a1a;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    
+    .btn-filter-apply:hover {
+        background: #e6c200;
+    }
+    
+    .btn-filter-reset {
+        padding: 0.75rem 1.5rem;
+        background: #f3f4f6;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        color: #4b5563;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-filter-reset:hover {
+        background: #e5e7eb;
+        color: #1f2937;
+    }
+    
+    /* Responsive filtres */
+    @media (max-width: 768px) {
+        .search-bar {
+            flex-direction: column;
+        }
+        
+        .search-btn {
+            width: 100%;
+        }
+        
+        .quick-filters {
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            padding-bottom: 0.5rem;
+        }
+        
+        .quick-filter-btn {
+            flex-shrink: 0;
+        }
+        
+        .filters-actions {
+            flex-direction: column;
+        }
+        
+        .btn-filter-apply,
+        .btn-filter-reset {
+            width: 100%;
+            text-align: center;
+        }
+    }
+
+    /* ========== LISTE DES COMMANDES ========== */
+    .commandes-header,
+    .commande-row {
+        display: grid;
+        grid-template-columns: 100px 110px 90px 1fr 85px 100px 100px 120px;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+    }
+    
+    .commandes-header {
+        background: #f8f9fa;
+        border-radius: 8px 8px 0 0;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+        border-bottom: 2px solid #e9ecef;
+    }
+    
+    .commandes-list {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .commande-row {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-top: none;
+        border-left: 4px solid #6c757d;
+    }
+    
+    .commande-row:last-child {
+        border-radius: 0 0 8px 8px;
+    }
+    
+    .commande-row:hover {
+        background: #fafafa;
+    }
+    
+    /* États */
+    .commande-row.en_attente { border-left-color: #ffc107; }
+    .commande-row.en_preparation { border-left-color: #17a2b8; }
+    .commande-row.prete { border-left-color: #28a745; }
+    .commande-row.terminee { border-left-color: #6c757d; }
+    .commande-row.annulee { border-left-color: #dc3545; opacity: 0.65; }
+    
+    .col-numero {
+        font-weight: 700;
+        font-size: 0.8rem;
+        color: #374151;
+        font-family: 'Consolas', monospace;
+    }
+    
+    .etat-badge {
+        padding: 3px 6px;
+        border-radius: 4px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+    
+    .type-badge {
+        padding: 3px 6px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+    
+    .type-badge.delivery { background: #e0f2fe; color: #0369a1; }
+    .type-badge.takeaway { background: #f3e8ff; color: #7c3aed; }
+    .type-badge.dine-in { background: #ffedd5; color: #c2410c; }
+    
+    .col-client {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    
+    .client-name {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #1a1a1a;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .client-phone {
+        font-size: 0.75rem;
+        color: #6b7280;
+    }
+    
+    .col-date {
+        display: flex;
+        flex-direction: column;
+        font-size: 0.8rem;
+        color: #4b5563;
+    }
+    
+    .col-date .time {
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+    
+    .col-zone {
+        font-size: 0.8rem;
+        color: #6b7280;
+    }
+    
+    .col-montant {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+    
+    .montant {
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: #059669;
+    }
+    
+    .paiement-badge {
+        padding: 2px 5px;
+        border-radius: 3px;
+        font-size: 0.6rem;
+        font-weight: 600;
+    }
+    
+    .paiement-badge.paid { background: #d1fae5; color: #047857; }
+    .paiement-badge.unpaid { background: #fee2e2; color: #dc2626; }
+    
+    .col-actions {
+        display: flex;
+        gap: 0.35rem;
+        justify-content: flex-end;
+    }
+    
+    .action-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 5px;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 0.85rem;
+    }
+    
+    .action-btn:hover { opacity: 0.8; }
+    .action-btn.view { background: #f3f4f6; color: #374151; }
+    .action-btn.prepare { background: #fef3c7; color: #d97706; }
+    .action-btn.ready { background: #cffafe; color: #0891b2; }
+    .action-btn.complete { background: #d1fae5; color: #059669; }
+    .action-btn.cancel { background: #fee2e2; color: #dc2626; }
+    }
+    
+    .total-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #FFD700;
+        color: #1a1a1a;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.8rem;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: #6b7280;
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        color: #d1d5db;
+        margin-bottom: 0.75rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 1200px) {
+        .commandes-header { display: none; }
+        
+        .commande-row {
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto auto;
+            gap: 0.5rem;
+        }
+        
+        .col-numero { grid-column: 1; }
+        .col-etat { grid-column: 2; justify-self: end; }
+        .col-type { grid-column: 1; }
+        .col-client { grid-column: 1 / -1; }
+        .col-date { grid-column: 1; }
+        .col-zone { grid-column: 2; }
+        .col-montant { grid-column: 1; }
+        .col-actions { grid-column: 2; justify-self: end; }
+    }
+</style>
 {% endblock %}

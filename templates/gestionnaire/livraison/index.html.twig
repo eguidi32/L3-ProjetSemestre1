@@ -3,49 +3,62 @@
 {% block title %}Gestion des Livraisons - Brasil Burger{% endblock %}
 
 {% block page_title %}Gestion des Livraisons{% endblock %}
+{% block page_subtitle %}Affectez les livreurs et suivez les livraisons{% endblock %}
+{% block page_icon %}<i class="bi bi-truck"></i>{% endblock %}
 
 {% block body %}
 <div class="row">
-    <!-- Commandes a affecter par zone -->
+    <!-- Commandes à affecter par zone -->
     <div class="col-lg-8">
-        <div class="card mb-4">
+        <div class="card mb-4 fade-in-up">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="bi bi-geo-alt me-2"></i>Commandes a affecter par zone</h5>
-                <span class="badge bg-warning text-dark">{{ totalNonAffectees }} en attente</span>
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    <span>Commandes à affecter par zone</span>
+                </div>
+                <span class="pending-badge">
+                    <i class="bi bi-hourglass-split"></i>
+                    {{ totalNonAffectees }} en attente
+                </span>
             </div>
             <div class="card-body">
                 {% if commandesParZone|length > 0 %}
                 <form action="{{ path('app_gestionnaire_livraison_affecter') }}" method="post" id="formAffectation">
                     <input type="hidden" name="_token" value="{{ csrf_token('affecter_livreur') }}">
                     
-                    <!-- Selection du livreur -->
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <label class="form-label"><strong>Affecter a un livreur</strong></label>
-                            <select name="livreur" class="form-select" required>
-                                <option value="">-- Selectionner un livreur --</option>
-                                {% for livreur in livreurs %}
-                                <option value="{{ livreur.id }}">
-                                    {{ livreur.nomComplet }} ({{ livreur.telephone }})
-                                </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-6 d-flex align-items-end">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-person-plus me-2"></i>Affecter les commandes selectionnees
-                            </button>
+                    <!-- Sélection du livreur -->
+                    <div class="affectation-box mb-4">
+                        <div class="row align-items-end">
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    <i class="bi bi-person-badge me-1"></i>
+                                    <strong>Sélectionner un livreur</strong>
+                                </label>
+                                <select name="livreur" class="form-select" required>
+                                    <option value="">-- Choisir un livreur --</option>
+                                    {% for livreur in livreurs %}
+                                    <option value="{{ livreur.id }}">
+                                        {{ livreur.nomComplet }} ({{ livreur.telephone }})
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6 mt-3 mt-md-0">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-person-plus me-2"></i>Affecter les commandes sélectionnées
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Commandes groupees par zone -->
+                    <!-- Commandes groupées par zone -->
                     <div class="accordion" id="accordionZones">
                         {% for zoneId, data in commandesParZone %}
                         <div class="accordion-item">
                             <h2 class="accordion-header">
                                 <button class="accordion-button {{ loop.first ? '' : 'collapsed' }}" type="button" 
                                         data-bs-toggle="collapse" data-bs-target="#zone{{ zoneId }}">
-                                    <strong>{{ data.nom }}</strong>
+                                    <span class="zone-name">{{ data.nom }}</span>
                                     <span class="badge bg-primary ms-2">{{ data.commandes|length }} commande(s)</span>
                                     {% if data.zone %}
                                     <span class="badge bg-secondary ms-2">{{ data.zone.prixLivraison|number_format(0, ',', ' ') }} F</span>
@@ -99,7 +112,7 @@
                 <div class="text-center py-5 text-muted">
                     <i class="bi bi-check-circle" style="font-size: 4rem;"></i>
                     <h5 class="mt-3">Aucune commande en attente d'affectation</h5>
-                    <p>Toutes les livraisons ont ete affectees</p>
+                    <p>Toutes les livraisons ont été affectées</p>
                 </div>
                 {% endif %}
             </div>
@@ -157,54 +170,34 @@
             </div>
         </div>
 
-        <!-- Resume des zones -->
-        <div class="card mt-4">
-            <div class="card-header">
-                <h6 class="mb-0"><i class="bi bi-map me-2"></i>Zones de livraison</h6>
-            </div>
-            <div class="card-body p-0">
-                <table class="table table-sm mb-0">
-                    <thead>
-                        <tr>
-                            <th>Zone</th>
-                            <th>Prix</th>
-                            <th>Quartiers</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for zone in zones %}
-                        <tr>
-                            <td><strong>{{ zone.nom }}</strong></td>
-                            <td>{{ zone.prixLivraison|number_format(0, ',', ' ') }} F</td>
-                            <td><small>{{ zone.quartiers|length > 30 ? zone.quartiers|slice(0, 30) ~ '...' : zone.quartiers }}</small></td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
         <!-- Livreurs disponibles -->
-        <div class="card mt-4">
+        <div class="card mt-4 fade-in-up" style="animation-delay: 0.2s;">
             <div class="card-header">
-                <h6 class="mb-0"><i class="bi bi-people me-2"></i>Livreurs disponibles</h6>
+                <i class="bi bi-people-fill"></i>
+                <span>Livreurs disponibles</span>
             </div>
             <div class="card-body p-0">
                 {% if livreurs|length > 0 %}
                 <ul class="list-group list-group-flush">
                     {% for livreur in livreurs %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong>{{ livreur.nomComplet }}</strong><br>
-                            <small class="text-muted">{{ livreur.telephone }}</small>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="livreur-avatar">
+                                {{ livreur.prenom|first|upper }}{{ livreur.nom|first|upper }}
+                            </div>
+                            <div>
+                                <strong>{{ livreur.nomComplet }}</strong><br>
+                                <small class="text-muted"><i class="bi bi-phone"></i> {{ livreur.telephone }}</small>
+                            </div>
                         </div>
-                        <span class="badge bg-success">Disponible</span>
+                        <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Disponible</span>
                     </li>
                     {% endfor %}
                 </ul>
                 {% else %}
-                <div class="text-center py-3 text-muted">
-                    <p class="mb-0">Aucun livreur disponible</p>
+                <div class="empty-state py-4">
+                    <i class="bi bi-person-x" style="font-size: 2rem;"></i>
+                    <p class="mb-0 mt-2">Aucun livreur disponible</p>
                 </div>
                 {% endif %}
             </div>
@@ -213,9 +206,67 @@
 </div>
 {% endblock %}
 
+{% block stylesheets %}
+<style>
+    .pending-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: linear-gradient(135deg, #FFD700, #e6c200);
+        color: #1a1a1a;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+    
+    .affectation-box {
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), transparent);
+        border: 1px solid rgba(255, 215, 0, 0.3);
+        border-radius: 12px;
+        padding: 20px;
+    }
+    
+    .zone-name {
+        color: #1a1a1a;
+        font-weight: 600;
+    }
+    
+    .zone-price {
+        color: #e6c200;
+        font-weight: 600;
+    }
+    
+    .livreur-avatar {
+        width: 42px;
+        height: 42px;
+        background: linear-gradient(135deg, #FFD700, #e6c200);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #1a1a1a;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .delivery-card {
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .delivery-card:hover {
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    }
+</style>
+{% endblock %}
+
 {% block javascripts %}
 <script>
-    // Selection de toutes les commandes d'une zone
+    // Sélection de toutes les commandes d'une zone
     document.querySelectorAll('.select-all-zone').forEach(function(checkbox) {
         checkbox.addEventListener('change', function() {
             const zoneId = this.dataset.zone;

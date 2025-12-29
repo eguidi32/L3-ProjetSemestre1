@@ -1,117 +1,348 @@
-{% extends 'base.html.twig' %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brasil Burger - Espace Gestionnaire</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
-{% block title %}Brasil Burger - Gestionnaire{% endblock %}
+        /* Navbar */
+        .navbar-custom {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+        }
+        
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff !important;
+        }
+        
+        .navbar-brand span {
+            color: #f39c12;
+        }
 
-{% block stylesheets %}
-<style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: #fff;
-    }
-    .container {
-        text-align: center;
-        padding: 40px;
-    }
-    .logo {
-        font-size: 4rem;
-        margin-bottom: 20px;
-    }
-    h1 {
-        font-size: 3rem;
-        margin-bottom: 10px;
-        background: linear-gradient(90deg, #f39c12, #e74c3c);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-    .subtitle {
-        font-size: 1.5rem;
-        color: #bdc3c7;
-        margin-bottom: 30px;
-    }
-    .status {
-        display: inline-block;
-        padding: 10px 30px;
-        background: linear-gradient(90deg, #27ae60, #2ecc71);
-        border-radius: 50px;
-        font-weight: bold;
-        margin-bottom: 40px;
-    }
-    .features {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-        max-width: 800px;
-        margin: 0 auto;
-    }
-    .feature {
-        background: rgba(255,255,255,0.1);
-        padding: 25px;
-        border-radius: 15px;
-        backdrop-filter: blur(10px);
-    }
-    .feature-icon {
-        font-size: 2.5rem;
-        margin-bottom: 15px;
-    }
-    .feature h3 {
-        margin-bottom: 10px;
-        color: #f39c12;
-    }
-    .feature p {
-        color: #bdc3c7;
-        font-size: 0.9rem;
-    }
-    .footer {
-        margin-top: 50px;
-        color: #7f8c8d;
-    }
-</style>
-{% endblock %}
+        /* Hero Section */
+        .hero {
+            min-height: calc(100vh - 70px);
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(243, 156, 18, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(231, 76, 60, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
 
-{% block body %}
-<div class="container">
-    <div class="logo">🍔</div>
-    <h1>Brasil Burger</h1>
-    <p class="subtitle">Système de Gestion - Symfony</p>
-    
-    <div class="status">✅ Déploiement réussi</div>
-    
-    <div class="features">
-        <div class="feature">
-            <div class="feature-icon">📦</div>
-            <h3>Catalogue</h3>
-            <p>Gérer burgers, menus et compléments</p>
+        .hero-content {
+            position: relative;
+            z-index: 10;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+        
+        .hero-title .highlight {
+            background: linear-gradient(90deg, #f39c12, #e74c3c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 40px;
+            max-width: 500px;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #f39c12, #e74c3c);
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            color: #fff;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(243, 156, 18, 0.3);
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(243, 156, 18, 0.4);
+            color: #fff;
+        }
+
+        .btn-secondary-custom {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 13px 35px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            color: #fff;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            margin-left: 15px;
+        }
+        
+        .btn-secondary-custom:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        /* Hero Image */
+        .hero-image {
+            position: relative;
+            text-align: center;
+        }
+        
+        .burger-icon {
+            font-size: 15rem;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Features */
+        .features-section {
+            padding: 80px 0;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .feature-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-5px);
+            border-color: rgba(243, 156, 18, 0.5);
+        }
+        
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #f39c12, #e74c3c);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 1.8rem;
+            color: #fff;
+        }
+        
+        .feature-card h4 {
+            color: #fff;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .feature-card p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 30px 0;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.9rem;
+        }
+        
+        .footer a {
+            color: #f39c12;
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            .burger-icon {
+                font-size: 10rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .hero {
+                text-align: center;
+            }
+            .hero-subtitle {
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .hero-image {
+                margin-top: 40px;
+            }
+            .btn-secondary-custom {
+                margin-left: 0;
+                margin-top: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="{{ path('app_home') }}">
+                Brasil <span>Burger</span>
+            </a>
+            <a href="{{ path('app_login') }}" class="btn btn-outline-light btn-sm">
+                <i class="bi bi-box-arrow-in-right"></i> Connexion
+            </a>
         </div>
-        <div class="feature">
-            <div class="feature-icon">📋</div>
-            <h3>Commandes</h3>
-            <p>Suivi et gestion des commandes</p>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 hero-content">
+                    <h1 class="hero-title">
+                        Gérez votre restaurant<br>
+                        <span class="highlight">en toute simplicité</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        Plateforme de gestion complète pour Brasil Burger. 
+                        Commandes, livraisons, statistiques - tout en un seul endroit.
+                    </p>
+                    <div class="d-flex flex-wrap">
+                        <a href="{{ path('app_login') }}" class="btn-login">
+                            <i class="bi bi-person-lock"></i> Accès Gestionnaire
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 hero-image d-none d-lg-block">
+                    <div class="burger-icon"></div>
+                </div>
+            </div>
         </div>
-        <div class="feature">
-            <div class="feature-icon">🚚</div>
-            <h3>Livraisons</h3>
-            <p>Organisation par zone</p>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="container">
+            <h2 class="section-title">Fonctionnalités principales</h2>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-receipt"></i>
+                        </div>
+                        <h4>Commandes</h4>
+                        <p>Suivi en temps réel, filtres avancés, gestion des états</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-truck"></i>
+                        </div>
+                        <h4>Livraisons</h4>
+                        <p>Organisation par zone, affectation des livreurs</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </div>
+                        <h4>Statistiques</h4>
+                        <p>KPIs journaliers, graphiques, évolution hebdomadaire</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <h4>Sécurisé</h4>
+                        <p>Authentification gestionnaire, contrôle d'accès</p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="feature">
-            <div class="feature-icon">📊</div>
-            <h3>Statistiques</h3>
-            <p>Tableau de bord temps réel</p>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>
+                Projet L3 - Semestre 1 | {{ "now"|date("Y") }} | 
+                <a href="#">Symfony {{ constant('Symfony\\Component\\HttpKernel\\Kernel::VERSION') }}</a>
+            </p>
         </div>
-    </div>
-    
-    <div class="footer">
-        <p>Projet L3 - Semestre 1 | {{ "now"|date("Y") }}</p>
-    </div>
-</div>
-{% endblock %}
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

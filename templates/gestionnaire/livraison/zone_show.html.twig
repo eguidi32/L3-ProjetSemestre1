@@ -1,0 +1,73 @@
+{% extends 'gestionnaire/base.html.twig' %}
+
+{% block title %}Zone {{ zone.nom }} - Brasil Burger{% endblock %}
+
+{% block page_title %}Zone: {{ zone.nom }}{% endblock %}
+{% block page_subtitle %}Détails de la zone de livraison{% endblock %}
+{% block page_icon %}<i class="bi bi-geo-alt-fill"></i>{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-info-circle"></i> Informations de la zone
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted small">Nom de la zone</label>
+                        <p class="fw-bold fs-5">{{ zone.nom }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted small">Frais de livraison</label>
+                        <p class="fw-bold fs-5 text-success">
+                            {% if zone.prixLivraison == 0 %}
+                                Gratuit
+                            {% else %}
+                                {{ zone.prixLivraison|number_format(0, ',', ' ') }} F
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Quartiers couverts</label>
+                    <p>{{ zone.quartiers }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-bar-chart"></i> Statistiques
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                    <span class="text-muted">Commandes livrées</span>
+                    <span class="badge bg-success fs-6">{{ commandesLivrees }}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted">Commandes en cours</span>
+                    <span class="badge bg-warning text-dark fs-6">{{ commandesEnCours }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-gear"></i> Actions
+            </div>
+            <div class="card-body d-grid gap-2">
+                <a href="{{ path('app_gestionnaire_zone_edit', {id: zone.id}) }}" class="btn btn-primary">
+                    <i class="bi bi-pencil me-2"></i>Modifier la zone
+                </a>
+                <a href="{{ path('app_gestionnaire_zones') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Retour aux zones
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -7,6 +7,7 @@ use App\Repository\BurgerRepository;
 use App\Repository\CommandeRepository;
 use App\Repository\MenuRepository;
 use App\Repository\UtilisateurRepository;
+use App\Service\CommandeService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,6 +19,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_GESTIONNAIRE')]
 class CommandeController extends AbstractController
 {
+    private const ITEMS_PER_PAGE = 20;
+
     public function __construct(
         private EntityManagerInterface $entityManager
     ) {}
@@ -30,6 +33,8 @@ class CommandeController extends AbstractController
         BurgerRepository $burgerRepository,
         MenuRepository $menuRepository
     ): Response {
+        set_time_limit(300);
+        
         // Récupérer les filtres
         $etat = $request->query->get('etat');
         $typeService = $request->query->get('type_service');
@@ -39,8 +44,11 @@ class CommandeController extends AbstractController
         $burgerId = $request->query->get('burger') ? (int) $request->query->get('burger') : null;
         $menuId = $request->query->get('menu') ? (int) $request->query->get('menu') : null;
         $recherche = $request->query->get('recherche');
+        
+        // Pagination
+        $page = max(1, $request->query->getInt('page', 1));
 
-        // Appliquer les filtres
+        // Appliquer les filtres avec pagination
         $commandes = $commandeRepository->findWithFilters(
             $etat, 
             $typeService, 
@@ -49,8 +57,24 @@ class CommandeController extends AbstractController
             $clientId, 
             $burgerId, 
             $menuId,
+            $recherche,
+            $page,
+            self::ITEMS_PER_PAGE
+        );
+
+        // Compter le total pour la pagination
+        $totalCommandes = $commandeRepository->countWithFilters(
+            $etat,
+            $typeService,
+            $dateDebut,
+            $dateFin,
+            $clientId,
+            $burgerId,
+            $menuId,
             $recherche
         );
+
+        $totalPages = (int) ceil($totalCommandes / self::ITEMS_PER_PAGE);
 
         // Récupérer les listes pour les filtres
         $clients = $utilisateurRepository->findClients();
@@ -71,6 +95,12 @@ class CommandeController extends AbstractController
                 'burger' => $burgerId,
                 'menu' => $menuId,
                 'recherche' => $recherche,
+            ],
+            'pagination' => [
+                'page' => $page,
+                'totalPages' => $totalPages,
+                'totalItems' => $totalCommandes,
+                'itemsPerPage' => self::ITEMS_PER_PAGE,
             ],
         ]);
     }
@@ -290,5 +320,36 @@ class CommandeController extends AbstractController
             Commande::ETAT_ANNULEE => 'Annulée',
             default => $etat,
         };
+    }
+
+    #[Route('/export', name: 'app_gestionnaire_commandes_export')]
+    public function export(
+        Request $request,
+        CommandeRepository $commandeRepository,
+        CommandeService $commandeService
+    ): Response {
+        // Récupérer les filtres
+        $etat = $request->query->get('etat');
+        $typeService = $request->query->get('type_service');
+        $dateDebut = $request->query->get('date_debut') ? new \DateTime($request->query->get('date_debut')) : null;
+        $dateFin = $request->query->get('date_fin') ? new \DateTime($request->query->get('date_fin') . ' 23:59:59') : null;
+        $clientId = $request->query->get('client') ? (int) $request->query->get('client') : null;
+        $recherche = $request->query->get('recherche');
+
+        // Récupérer toutes les commandes (sans pagination pour l'export)
+        $commandes = $commandeRepository->findWithFilters(
+            $etat,
+            $typeService,
+            $dateDebut,
+            $dateFin,
+            $clientId,
+            null,
+            null,
+            $recherche,
+            1,
+            10000 // Max pour l'export
+        );
+
+        return $commandeService->exporterCommandesCsv($commandes);
     }
 }

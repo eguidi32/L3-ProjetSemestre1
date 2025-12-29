@@ -27,6 +27,8 @@ class LivraisonController extends AbstractController
         ZoneRepository $zoneRepository,
         UtilisateurRepository $utilisateurRepository
     ): Response {
+        set_time_limit(300);
+        
         // Recuperer les commandes en livraison pretes (non affectees)
         $commandesNonAffectees = $commandeRepository->createQueryBuilder('c')
             ->where('c.typeService = :type')
@@ -69,14 +71,10 @@ class LivraisonController extends AbstractController
         // Livreurs disponibles
         $livreurs = $utilisateurRepository->findLivreursDisponibles();
 
-        // Zones
-        $zones = $zoneRepository->findAll();
-
         return $this->render('gestionnaire/livraison/index.html.twig', [
             'commandesParZone' => $commandesParZone,
             'commandesEnLivraison' => $commandesEnLivraison,
             'livreurs' => $livreurs,
-            'zones' => $zones,
             'totalNonAffectees' => count($commandesNonAffectees),
         ]);
     }
@@ -151,5 +149,64 @@ class LivraisonController extends AbstractController
         }
 
         return $this->redirectToRoute('app_gestionnaire_livraisons');
+    }
+
+    #[Route('/zones', name: 'app_gestionnaire_zones')]
+    public function zones(ZoneRepository $zoneRepository): Response
+    {
+        $zones = $zoneRepository->findAll();
+
+        return $this->render('gestionnaire/livraison/zones.html.twig', [
+            'zones' => $zones
+        ]);
+    }
+
+    #[Route('/zones/{id}', name: 'app_gestionnaire_zone_show', methods: ['GET'])]
+    public function showZone(\App\Entity\Zone $zone, CommandeRepository $commandeRepository): Response
+    {
+        // Compter les commandes livrées dans cette zone
+        $commandesLivrees = $commandeRepository->count([
+            'zone' => $zone,
+            'etat' => Commande::ETAT_TERMINEE
+        ]);
+
+        // Compter les commandes en cours dans cette zone
+        $commandesEnCours = $commandeRepository->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->where('c.zone = :zone')
+            ->andWhere('c.etat NOT IN (:etats)')
+            ->setParameter('zone', $zone)
+            ->setParameter('etats', [Commande::ETAT_TERMINEE, Commande::ETAT_ANNULEE])
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return $this->render('gestionnaire/livraison/zone_show.html.twig', [
+            'zone' => $zone,
+            'commandesLivrees' => $commandesLivrees,
+            'commandesEnCours' => $commandesEnCours
+        ]);
+    }
+
+    #[Route('/zones/{id}/modifier', name: 'app_gestionnaire_zone_edit', methods: ['GET', 'POST'])]
+    public function editZone(Request $request, \App\Entity\Zone $zone): Response
+    {
+        if ($request->isMethod('POST')) {
+            $token = $request->request->get('_token');
+            
+            if ($this->isCsrfTokenValid('edit_zone_' . $zone->getId(), $token)) {
+                $zone->setNom($request->request->get('nom'));
+                $zone->setPrixLivraison($request->request->get('prix_livraison'));
+                $zone->setQuartiers($request->request->get('quartiers'));
+                
+                $this->entityManager->flush();
+                
+                $this->addFlash('success', 'La zone "' . $zone->getNom() . '" a été modifiée avec succès.');
+                return $this->redirectToRoute('app_gestionnaire_zones');
+            }
+        }
+
+        return $this->render('gestionnaire/livraison/zone_edit.html.twig', [
+            'zone' => $zone
+        ]);
     }
 }
